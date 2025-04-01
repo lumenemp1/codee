@@ -23,3 +23,61 @@ spiece.model: 100%|████████████████████�
 tokenizer.json: 100%|███████████████████████████████████████████████████████████████| 2.42M/2.42M [00:01<00:00, 2.13MB/s] 
 special_tokens_map.json: 100%|██████████████████████████████████████████████████████| 2.20k/2.20k [00:00<00:00, 26.4MB/s] 
 Processing query...
+
+
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+import torch
+import argparse
+
+def generate_sql(question, schema):
+    # Load with lower precision to save memory
+    model = AutoModelForSeq2SeqLM.from_pretrained(
+        'gaussalgo/T5-LM-Large-text2sql-spider',
+        torch_dtype=torch.float16,  # Use half precision
+        device_map="auto"  # Automatically decide best device placement
+    )
+    tokenizer = AutoTokenizer.from_pretrained('gaussalgo/T5-LM-Large-text2sql-spider')
+    
+    input_text = " ".join(["Question: ", question, "Schema:", schema])
+    
+    print("Processing query...")
+    model_inputs = tokenizer(input_text, return_tensors="pt")
+    
+    # Move inputs to the same device as model
+    for k, v in model_inputs.items():
+        model_inputs[k] = v.to(model.device)
+    
+    outputs = model.generate(
+        **model_inputs,
+        max_length=512,
+        num_beams=5,  # Beam search for better results
+        early_stopping=True
+    )
+    
+    sql_query = tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
+    return sql_query
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Generate SQL from natural language')
+    parser.add_argument('--question', type=str, help='The natural language question')
+    parser.add_argument('--schema_file', type=str, help='File containing the database schema')
+    
+    args = parser.parse_args()
+    
+    if args.question and args.schema_file:
+        with open(args.schema_file, 'r') as f:
+            schema = f.read()
+        
+        sql = generate_sql(args.question, schema)
+        print("\nGenerated SQL Query:")
+        print(sql)
+    else:
+        # Use the example from your code if no arguments provided
+        question = "What is the average, minimum, and maximum age for all French musicians?"
+        schema = """
+           "stadium" "Stadium_ID" int , "Location" text , "Name" text , "Capacity" int , "Highest" int , "Lowest" int , "Average" int , foreign_key:  primary key: "Stadium_ID" [SEP] "singer" "Singer_ID" int , "Name" text , "Country" text , "Song_Name" text , "Song_release_year" text , "Age" int , "Is_male" bool , foreign_key:  primary key: "Singer_ID" [SEP] "concert" "concert_ID" int , "concert_Name" text , "Theme" text , "Year" text , foreign_key: "Stadium_ID" text from "stadium" "Stadium_ID" , primary key: "concert_ID" [SEP] "singer_in_concert"  foreign_key: "concert_ID" int from "concert" "concert_ID" , "Singer_ID" text from "singer" "Singer_ID" , primary key: "concert_ID" "Singer_ID"
+        """
+        
+        sql = generate_sql(question, schema)
+        print("\nGenerated SQL Query:")
+        print(sql)
