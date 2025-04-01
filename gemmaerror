@@ -1,110 +1,12 @@
-PS C:\Users\AD54619\Text2Sql> python gemma.py    
-⏳ Loading Gemma-2B model... This may take a minute.
 Traceback (most recent call last):
-  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\huggingface_hub\utils\_http.py", line 409, in hf_raise_for_status
-    response.raise_for_status()
-    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
-    raise HTTPError(http_error_msg, response=self)
-requests.exceptions.HTTPError: 401 Client Error: Unauthorized for url: https://huggingface.co/google/gemma-2b/resolve/main/config.json
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\transformers\utils\hub.py", line 424, in cached_files       
-    hf_hub_download(
-    ~~~~~~~~~~~~~~~^
-        path_or_repo_id,
-        ^^^^^^^^^^^^^^^^
-    ...<10 lines>...
-        local_files_only=local_files_only,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\huggingface_hub\utils\_validators.py", line 114, in _inner_fn
-    return fn(*args, **kwargs)
-  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\huggingface_hub\file_download.py", line 961, in hf_hub_download
-    return _hf_hub_download_to_cache_dir(
-        # Destination
-    ...<14 lines>...
-        force_download=force_download,
-    )
-  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\huggingface_hub\file_download.py", line 1068, in _hf_hub_download_to_cache_dir
-    _raise_on_head_call_error(head_call_error, force_download, local_files_only)
-    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\huggingface_hub\file_download.py", line 1596, in _raise_on_head_call_error
-    raise head_call_error
-  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\huggingface_hub\file_download.py", line 1484, in _get_metadata_or_catch_error
-    metadata = get_hf_file_metadata(
-        url=url, proxies=proxies, timeout=etag_timeout, headers=headers, token=token
-    )
-  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\huggingface_hub\utils\_validators.py", line 114, in _inner_fn
-    return fn(*args, **kwargs)
-  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\huggingface_hub\file_download.py", line 1401, in get_hf_file_metadata
-    r = _request_wrapper(
-        method="HEAD",
-    ...<5 lines>...
-        timeout=timeout,
-    )
-  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\huggingface_hub\file_download.py", line 285, in _request_wrapper
-    response = _request_wrapper(
-        method=method,
-    ...<2 lines>...
-        **params,
-    )
-  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\huggingface_hub\file_download.py", line 309, in _request_wrapper
-    hf_raise_for_status(response)
-    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
-  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\huggingface_hub\utils\_http.py", line 426, in hf_raise_for_status
-    raise _format(GatedRepoError, message, response) from e
-huggingface_hub.errors.GatedRepoError: 401 Client Error. (Request ID: Root=1-67ec37b7-701abcee6d8415016a809420;6cd35960-ce4b-4af2-9545-5af8011a11b2)
-
-Cannot access gated repo for url https://huggingface.co/google/gemma-2b/resolve/main/config.json.
-Access to model google/gemma-2b is restricted. You must have access to it and be authenticated to access it. Please log in.
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "C:\Users\AD54619\Text2Sql\gemma.py", line 67, in <module>
-    main()
-    ~~~~^^
-  File "C:\Users\AD54619\Text2Sql\gemma.py", line 41, in main
-    tokenizer, model = load_model()
-                       ~~~~~~~~~~^^
-  File "C:\Users\AD54619\Text2Sql\gemma.py", line 11, in load_model
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\transformers\models\auto\tokenization_auto.py", line 930, in
- from_pretrained
-    config = AutoConfig.from_pretrained(
-        pretrained_model_name_or_path, trust_remote_code=trust_remote_code, **kwargs
-    )
-  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\transformers\models\auto\configuration_auto.py", line 1096, in from_pretrained
-    config_dict, unused_kwargs = PretrainedConfig.get_config_dict(pretrained_model_name_or_path, **kwargs)
-                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\transformers\configuration_utils.py", line 594, in get_config_dict
-    config_dict, kwargs = cls._get_config_dict(pretrained_model_name_or_path, **kwargs)
-                          ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\transformers\configuration_utils.py", line 653, in _get_config_dict
-    resolved_config_file = cached_file(
-        pretrained_model_name_or_path,
-    ...<10 lines>...
-        _commit_hash=commit_hash,
-    )
-  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\transformers\utils\hub.py", line 266, in cached_file        
-    file = cached_files(path_or_repo_id=path_or_repo_id, filenames=[filename], **kwargs)
-  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\transformers\utils\hub.py", line 481, in cached_files       
-    raise EnvironmentError(
-    ...<2 lines>...
-    ) from e
-OSError: You are trying to access a gated repo.
-Make sure to have access to it at https://huggingface.co/google/gemma-2b.
-401 Client Error. (Request ID: Root=1-67ec37b7-701abcee6d8415016a809420;6cd35960-ce4b-4af2-9545-5af8011a11b2)
-
-Cannot access gated repo for url https://huggingface.co/google/gemma-2b/resolve/main/config.json.
-Access to model google/gemma-2b is restricted. You must have access to it and be authenticated to access it. Please log in.
-PS C:\Users\AD54619\Text2Sql>
-
-
+  File "C:\Users\AD54619\Text2Sql\gemma.py", line 24, in <module>
+    inputs = tokenizer(prompt, return_tensors="pt").to("cuda")
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\transformers\tokenization_utils_base.py", line 821, in to
+    k: v.to(device=device, non_blocking=non_blocking) if isinstance(v, torch.Tensor) else v
+       ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\torch\cuda\__init__.py", line 310, in _lazy_init
+    raise AssertionError("Torch not compiled with CUDA enabled")
+AssertionError: Torch not compiled with CUDA enabled
 
 
 
