@@ -1,0 +1,16 @@
+ Schema loaded.
+
+🔹 Text-to-SQL Generator is ready! Type your question below.
+🛑 Type 'exit' to quit the application.
+
+💬 Enter your natural language question: give me query to get maximum salary in employee table
+
+⏳ Generating SQL Query...
+
+Device set to use cpu
+C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\transformers\generation\configuration_utils.py:628: UserWarning: `do_sample` is set to `False`. However, `temperature` is set to `0.1` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `temperature`.
+  warnings.warn(
+C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\transformers\generation\configuration_utils.py:633: UserWarning: `do_sample` is set to `False`. However, `top_p` is set to `0.9` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_p`.
+  warnings.warn(
+✅ Generated SQL Query:
+INVALID SQL OUTPUT
