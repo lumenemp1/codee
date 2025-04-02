@@ -1,0 +1,116 @@
+import os
+import sys
+from typing import Optional
+
+# If you have "langchain_community" installed:
+# pip install -U langchain-community
+from langchain_community.utilities import SQLDatabase
+from langchain_huggingface import HuggingFacePipeline # or from langchain_huggingface
+from langchain_community.agent_toolkits import create_sql_agent
+from langchain.chains import create_sql_query_chain
+from langchain.agents.agent_types import AgentType
+
+from sqlalchemy import create_engine
+import langchain
+langchain.debug = True
+
+##############################
+# TINYLLAMA LOAD
+##############################
+import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+
+MODEL_NAME = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+
+
+def load_tinyllama_langchain_llm():
+    print("⏳ Loading TinyLlama model (HuggingFace style)...")
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+    model = AutoModelForCausalLM.from_pretrained(
+        MODEL_NAME,
+        torch_dtype=torch.float16,
+        device_map="auto",
+    )
+    print("✅ Model loaded!")
+
+    hf_pipe = pipeline(
+        "text-generation",
+        model=model,
+        tokenizer=tokenizer,
+        max_new_tokens=256,
+        temperature=0.7,
+        top_p=0.9,
+        pad_token_id=tokenizer.eos_token_id,
+    )
+    # Convert to a LangChain(-community) LLM
+    llm = HuggingFacePipeline(pipeline=hf_pipe)
+    return llm
+
+##############################
+# PARTIAL SCHEMA SELECTION
+##############################
+def pick_tables(question: str, all_tables: list) -> list:
+    """Naive approach: pick tables whose names appear in the question."""
+    question_lower = question.lower()
+    relevant = [t for t in all_tables if t.lower() in question_lower]
+    # Fallback if no match
+    return relevant or all_tables[:3]
+
+
+def main():
+    # 1) Load local TinyLlama model as an LLM
+    llm = load_tinyllama_langchain_llm()
+
+    # 2) MySQL credentials
+    user = "root"
+    password = "admin"
+    host = "localhost"
+    port = 3306
+    database = "chatbot"
+
+    db_uri = f"mysql+pymysql://{user}:{password}@{host}:{port}/{database}"
+
+    print("\n🔹TinyLlama Chat w/ MySQL using LangChain.\n")
+    print("Type 'exit' or 'quit' to stop.\n")
+
+    while True:
+        question = input("User Question: ")
+        if question.strip().lower() in ["exit", "quit"]:
+            break
+
+        # 3) PARTIAL REFLECTION: 
+        #    let's reflect only table names first
+        wide_db = SQLDatabase.from_uri(db_uri, include_tables=None)
+
+        # The new method is get_usable_table_names
+        all_table_names = wide_db.get_usable_table_names()
+        print(f"[DEBUG] Table Names: {all_table_names}")
+
+        # 4) choose relevant tables
+        relevant_tables = pick_tables(question, all_table_names)
+        print(f"[DEBUG] Using these tables: {relevant_tables}")
+
+        # 5) reflect columns only for relevant tables
+        filtered_db = SQLDatabase.from_uri(db_uri, include_tables=relevant_tables)
+
+        # 6) create_sql_query_chain (Remove 'verbose' argument)
+        chain = create_sql_query_chain(
+            llm=llm,
+            db=filtered_db
+            # prompt=...,  # if you want a custom prompt
+            # output_parser=...,  # if you want an output parser
+        )
+
+        # 7) run the chain
+        try:
+            result = chain.invoke({"question":question})
+            
+            print(f"\nAssistant Answer:\n{result}\n")
+        except Exception as e:
+            print(f"\n❌ Error while generating/executing query: {e}")
+
+    print("👋 Exiting. Goodbye!")
+
+
+if __name__ == "__main__":
+    main()
