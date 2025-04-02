@@ -1,0 +1,28 @@
+PS C:\Users\AD54619\Text2Sql> python better_tiny.py
+C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain\llms\__init__.py:549: LangChainDeprecationWarning: Importing LLMs from langchain is deprecated. Importing from langchain will no longer be supported as of langchain==0.2.0. Please import from langchain-community instead:
+
+`from langchain_community.llms import HuggingFacePipeline`.
+
+To install langchain-community run `pip install -U langchain-community`.
+  warnings.warn(
+⏳ Loading TinyLlama model (HuggingFace style)...
+✅ Model loaded!
+Device set to use cpu
+C:\Users\AD54619\Text2Sql\better_tiny.py:50: LangChainDeprecationWarning: The class `HuggingFacePipeline` was deprecated in LangChain 0.0.37 and will be removed in 1.0. An updated version of the class exists in the :class:`~langchain-huggingface package and should be used instead. To use it run `pip install -U :class:`~langchain-huggingface` and import as `from :class:`~langchain_huggingface import HuggingFacePipeline``.
+  llm = HuggingFacePipeline(pipeline=hf_pipe)
+
+🔹TinyLlama Chat w/ MySQL using LangChain.
+
+Type 'exit' or 'quit' to stop.
+
+User Question: employees having more than 50000 salary
+C:\Users\AD54619\Text2Sql\better_tiny.py:92: LangChainDeprecationWarning: The method `SQLDatabase.get_table_names` was deprecated in langchain-community 0.0.1 and will be removed in 1.0. Use :meth:`~get_usable_table_names` instead.
+  all_table_names = wide_db.get_table_names()
+[*] Using these tables: ['employees']
+Traceback (most recent call last):
+  File "C:\Users\AD54619\Text2Sql\better_tiny.py", line 114, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\AD54619\Text2Sql\better_tiny.py", line 102, in main
+    chain = create_sql_query_chain(llm, filtered_db, verbose=True)
+TypeError: create_sql_query_chain() got an unexpected keyword argument 'verbose'
