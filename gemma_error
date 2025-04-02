@@ -1,2 +1,14 @@
 Asking to truncate to max_length but no maximum length is provided and the model has no predefined maximum length. Default to no truncation.
 The attention mask is not set and cannot be inferred from input because pad token is same as eos token. As a consequence, you may observe unexpected behavior. Please pass your input's `attention_mask` to obtain reliable results.
+
+
+
+Type your question and get the SQL query (type 'exit' to quit):
+
+User: What are the names of all employees
+
+Generated SQL Query:
+SELECT name FROM employees;
+    <end_of_turn>
+    <start_of_turn>user
+    SELEC
