@@ -1,4 +1,59 @@
 
+PS C:\Users\AD54619\Text2Sql> python better_tiny.py
+⏳ Loading TinyLlama model (HuggingFace style)...
+✅ Model loaded!
+Device set to use cpu
+
+🔹TinyLlama Chat w/ MySQL using LangChain.
+
+Type 'exit' or 'quit' to stop.
+
+[DEBUG] Table Names: ['departments', 'employees']
+User Question: which employees belong to finance department
+[DEBUG] Using these tables: ['employees']
+Traceback (most recent call last):
+  File "C:\Users\AD54619\Text2Sql\better_tiny.py", line 119, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\AD54619\Text2Sql\better_tiny.py", line 103, in main
+    chain = create_sql_query_chain(
+        llm=llm,
+        db=filtered_db,
+        prompt=custom_prompt
+    )
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain\chains\sql_database\query.py", line 122, in create_sql_query_chain  
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Prompt must have input variables: 'input', 'top_k', 'table_info'. Received prompt with input variables: ['question']. Full prompt:
+
+input_variables=['question'] input_types={} partial_variables={} template='Generate a valid MySQL query for the following question:\n{question}\n\nReturn ONLY the SQL query. No extra explanation or examples.'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 S C:\Users\AD54619\Text2Sql> python better_tiny.py
 ⏳ Loading TinyLlama model (HuggingFace style)...
 ✅ Model loaded!
