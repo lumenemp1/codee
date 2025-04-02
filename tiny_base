@@ -1,0 +1,66 @@
+import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+
+# Model Name (TinyLlama-7B)
+MODEL_NAME = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"  # Check Hugging Face for latest versions
+
+# Load Model and Tokenizer
+def load_model():
+    print("⏳ Loading TinyLlama model... This may take a minute.")
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+    model = AutoModelForCausalLM.from_pretrained(
+        MODEL_NAME,
+        torch_dtype=torch.float16,  # Use float16 for efficiency
+        device_map="auto",         # Automatically choose the best available device
+    )
+    print("✅ Model loaded successfully!")
+    return tokenizer, model
+
+# Generate SQL Query
+def generate_sql(question, schema, tokenizer, model, max_tokens=128):
+    #input_text = f"Generate an SQL query.\n\nSchema:\n{schema}\n\nQuestion:\n{question}\n\nSQL:"
+    input_text = f"Generate an SQL query strictly based on the schema provided.\n\nSchema:\n{schema}\n\nQuestion:\n{question}\n\nOnly output SQL code. Do not output any explanation or additional text.\nSQL:"
+    
+    pipe = pipeline(
+        "text-generation",
+        model=model,
+        tokenizer=tokenizer,
+        max_new_tokens=max_tokens,
+        do_sample=True,       # Enables sampling for more diverse responses
+        temperature=0.7,      # Controls randomness (lower = more deterministic)
+        top_p=0.9,           # Nucleus sampling
+        return_full_text=False,
+    )
+
+    sql_query = pipe(input_text, num_return_sequences=1)[0]["generated_text"]
+    return sql_query.strip()
+
+def main():
+    # Load model once
+    tokenizer, model = load_model()
+
+    # Load schema from file
+    schema_file = 'schema.txt'
+    try:
+        with open(schema_file, 'r') as f:
+            schema = f.read().strip()
+        print("✅ Schema loaded.")
+    except FileNotFoundError:
+        print(f"❌ Error: {schema_file} not found.")
+        return
+
+    print("\n🔹 Text-to-SQL Generator is ready! Type your question below.")
+    print("🛑 Type 'exit' to quit the application.\n")
+
+    while True:
+        question = input("💬 Enter your natural language question: ")
+        if question.lower() in ["exit", "quit"]:
+            print("👋 Exiting application. Goodbye!")
+            break
+
+        print("\n⏳ Generating SQL Query...\n")
+        sql_query = generate_sql(question, schema, tokenizer, model)
+        print(f"✅ Generated SQL Query:\n{sql_query}\n")
+
+if __name__ == "__main__":
+    main()
