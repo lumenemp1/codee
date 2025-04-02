@@ -1,0 +1,16 @@
+PS C:\Users\AD54619\Text2Sql> python gemmad.py
+Loading checkpoint shards: 100%|█████████████████████████████████████████████████████████████████████████████| 2/2 [00:00<00:00, 88.05it/s]
+Device set to use cpu
+C:\Users\AD54619\Text2Sql\gemmad.py:51: LangChainDeprecationWarning: The class `HuggingFacePipeline` was deprecated in LangChain 0.0.37 and will be removed in 1.0. An updated version of the class exists in the :class:`~langchain-huggingface package and should be used instead. To use it run `pip install -U :class:`~langchain-huggingface` and import as `from :class:`~langchain_huggingface import HuggingFacePipeline``.
+  llm = HuggingFacePipeline(pipeline=pipeline_model)
+Traceback (most recent call last):
+  File "C:\Users\AD54619\Text2Sql\gemmad.py", line 68, in <module>
+    sql_chain = create_sql_query_chain(llm, db, prompt)
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain\chains\sql_database\query.py", line 122, in create_sql_query_chain  
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Prompt must have input variables: 'input', 'top_k', 'table_info'. Received prompt with input variables: ['question', 'schema']. Full prompt:
+
+input_variables=['question', 'schema'] input_types={} partial_variables={} template='\n    Given the following MySQL database schema:\n\n    {schema}\n\n    Convert the following natural language query into an optimized SQL query:\n\n    "{question}"\n\n    Respond only with the SQL query and no explanations.\n    '
+PS C:\Users\AD54619\Text2Sql> 
