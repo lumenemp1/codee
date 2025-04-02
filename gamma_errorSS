@@ -1,0 +1,31 @@
+
+User: which department is located in NEW york
+
+Generated SQL Query:
+<start_of_turn>user
+    You are an intelligent AI specialized in generating SQL queries.
+    Your task is to assist users in formulating SQL queries to retrieve specific information from a database.
+    Please provide the SQL query corresponding to the given prompt and schema:
+
+    Schema:
+
+CREATE TABLE employees (
+    id INT PRIMARY KEY,
+    name TEXT NOT NULL,
+    age INT,
+    department TEXT,
+    salary INT
+);
+
+CREATE TABLE departments (
+    id INT PRIMARY KEY,
+    department_name TEXT NOT NULL,
+    location TEXT
+);
+
+
+    Prompt:
+    which department is located in NEW york
+    SQL:
+
+    SELECT departments.department_name FROM departments INNER JOIN employees ON departments.id = employees.department WHERE departments.location = 'NEW YORK
