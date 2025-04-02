@@ -12,3 +12,16 @@ SELECT name FROM employees;
     <end_of_turn>
     <start_of_turn>user
     SELEC
+
+
+S C:\Users\AD54619\Text2Sql> python gemma_sql.py
+Loading model... (This may take some time)
+Loading checkpoint shards: 100%|███████████████████████████████████████████████████████████| 2/2 [00:13<00:00,  6.53s/it]
+Model loaded successfully!
+
+Type your question and get the SQL query (type 'exit' to quit):
+
+User: Which employees are older than 30 years and work in the 'Sales' department
+
+Generated SQL Query:
+A query to retrieve the names and ages of employees who are older than 30 years and work in the 'Sales' department.       
