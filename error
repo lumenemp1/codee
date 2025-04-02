@@ -1,3 +1,50 @@
+
+
+Type 'exit' or 'quit' to stop.
+
+User Question: give me employee name whose salary is more than 50000
+[DEBUG] Using tables: ['departments', 'employees']
+Traceback (most recent call last):
+  File "C:\Users\AD54619\Text2Sql\better_tiny.py", line 132, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\AD54619\Text2Sql\better_tiny.py", line 108, in main
+    chain = create_sql_query_chain(
+        llm=llm,
+    ...<2 lines>...
+        top_k=3
+    )
+TypeError: create_sql_query_chain() got an unexpected keyword argument 'top_k'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ----
 PS C:\Users\AD54619\Text2Sql> python better_tiny.py
 ⏳ Loading TinyLlama model (HuggingFace style)...
