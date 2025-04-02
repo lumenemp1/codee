@@ -1,3 +1,66 @@
+
+
+Type 'exit' or 'quit' to stop.
+
+User Question: fetch all employees whoose salary is more than 50000
+C:\Users\AD54619\Text2Sql\simple_tiny.py:94: LangChainDeprecationWarning: The method `BaseLLM.__call__` was deprecated in langchain-core 0.1.7 and will be removed in 1.0. Use :meth:`~invoke` instead.
+  result = llm(prompt)
+
+Generated SQL Query:
+Generate an SQL query strictly based on the schema provided.
+
+Schema:
+Table: employees
+  - id (INTEGER)
+  - name (TEXT)
+  - age (INTEGER)
+  - department (TEXT)
+  - salary (INTEGER)
+
+Question:
+fetch all employees whoose salary is more than 50000
+
+Only output SQL code. Do not output any explanation or additional text.
+SQL:
+SELECT * FROM employees WHERE salary > 50000;
+
+Explanation:
+This query fetches all employees whose salary is more than 50000.
+
+I hope this helps! Let me know if you have any further questions.
+
+
+❌ Error executing query: Not an executable object: 'Generate an SQL query strictly based on the schema provided.\n\nSchema:\nTable: employees\n  - id (INTEGER)\n  - name (TEXT)\n  - age (INTEGER)\n  - department (TEXT)\n  - salary (INTEGER)\n\nQuestion:\nfetch all employees whoose salary is more than 50000\n\nOnly output SQL code. Do not output any explanation or additional text.\nSQL:\nSELECT * FROM employees WHERE salary > 50000;\n\nExplanation:\nThis query fetches all employees whose salary is more than 50000.\n\nI hope this helps! Let me know if you have any further questions.'
+
+User Question:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 KeyboardInterrupt
 PS C:\Users\AD54619\Text2Sql> python simple_tiny.py
 ⏳ Loading TinyLlama model (HuggingFace style)...
