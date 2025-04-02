@@ -44,3 +44,43 @@ User Question: employee whoose salary is more than 50000
 [DEBUG] Using these tables: ['departments', 'employees']
 
 ❌ Error while generating/executing query: 'RunnableSequence' object has no attribute 'run'
+
+
+
+.....
+...
+
+
+
+ser Question: which employee has more than 5000 salary
+[DEBUG] Table Names: ['departments', 'employees']
+[DEBUG] Using these tables: ['departments', 'employees']
+[chain/start] [chain:RunnableSequence] Entering Chain run with input:
+{
+  "input": "which employee has more than 5000 salary"
+}
+[chain/start] [chain:RunnableSequence > chain:RunnableAssign<input,table_info>] Entering Chain run with input:
+{
+  "input": "which employee has more than 5000 salary"
+}
+[chain/start] [chain:RunnableSequence > chain:RunnableAssign<input,table_info> > chain:RunnableParallel<input,table_info>] Entering Chain run with input:
+{
+  "input": "which employee has more than 5000 salary"
+}
+[chain/start] [chain:RunnableSequence > chain:RunnableAssign<input,table_info> > chain:RunnableParallel<input,table_info> > chain:RunnableLambda] Entering Chain run with input:
+{
+  "input": "which employee has more than 5000 salary"
+}
+[chain/start] [chain:RunnableSequence > chain:RunnableAssign<input,table_info> > chain:RunnableParallel<input,table_info> > chain:RunnableLambda] Entering Chain run with input:
+{
+  "input": "which employee has more than 5000 salary"
+}
+[chain/end] [chain:RunnableSequence > chain:RunnableAssign<input,table_info> > chain:RunnableParallel<input,table_info> > chain:RunnableLambda] [7ms] Exiting Chain run with output:
+{
+  "output": "\nCREATE TABLE departments (\n\tid INTEGER NOT NULL, \n\tdepartment_name TEXT NOT NULL, \n\tlocation TEXT, \n\tPRIMARY KEY (id)\n)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_0900_ai_ci\n\n/*\n3 rows from departments table:\nid\tdepartment_name\tlocation\n1\tEngineering\tNew York\n2\tMarketing\tChicago\n3\tFinance\tBoston\n*/\n\n\nCREATE TABLE employees (\n\tid INTEGER NOT NULL, \n\tname TEXT NOT NULL, \n\tage INTEGER, \n\tdepartment TEXT, \n\tsalary INTEGER, \n\tPRIMARY KEY (id)\n)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_0900_ai_ci\n\n/*\n3 rows from employees table:\nid\tname\tage\tdepartment\tsalary\n101\tJohn Smith\t35\t1\t85000\n102\tSarah Johnson\t42\t2\t78000\n103\tMichael Brown\t28\t1\t72000\n*/"
+}
+[chain/error] [chain:RunnableSequence > chain:RunnableAssign<input,table_info> > chain:RunnableParallel<input,table_info> > chain:RunnableLambda] [27ms] Chain run errored with error:
+"KeyError('question')Traceback (most recent call last):\n\n\n  File \"C:\\Users\\AD54619\\Text2Sql\\virtualen\\Lib\\site-packages\\langchain_core\\runnables\\base.py\", line 1925, in _call_with_config\n    context.run(\n    ~~~~~~~~~~~^\n        call_func_with_variable_args,  # type: ignore[arg-type]\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    ...<4 lines>...\n        **kwargs,\n        ^^^^^^^^^\n    ),\n    ^\n\n\n  File \"C:\\Users\\AD54619\\Text2Sql\\virtualen\\Lib\\site-packages\\langchain_core\\runnables\\config.py\", line 430, in call_func_with_variable_args\n    return func(input, **kwargs)  # type: ignore[call-arg]\n\n\n  File \"C:\\Users\\AD54619\\Text2Sql\\virtualen\\Lib\\site-packages\\langchain_core\\runnables\\base.py\", line 4573, in _invoke\n    output = call_func_with_variable_args(\n        self.func, input, config, run_manager, **kwargs\n    )\n\n\n  File \"C:\\Users\\AD54619\\Text2Sql\\virtualen\\Lib\\site-packages\\langchain_core\\runnables\\config.py\", line 430, in call_func_with_variable_args\n    return func(input, **kwargs)  # type: ignore[call-arg]\n\n\n  File \"C:\\Users\\AD54619\\Text2Sql\\virtualen\\Lib\\site-packages\\langchain\\chains\\sql_database\\query.py\", line 131, in <lambda>\n    \"input\": lambda x: x[\"question\"] + \"\\nSQLQuery: \",\n                       ~^^^^^^^^^^^^\n\n\nKeyError: 'question'"
+[chain/error] [chain:RunnableSequence > chain:RunnableAssign<input,table_info> > chain:RunnableParallel<input,table_info>] [65ms] Chain run errored with error:
+"KeyError('question')Traceback (most recent call last):\n\n\n  File \"C:\\Users\\AD54619\\Text2Sql\\virtualen\\Lib\\site-packages\\langchain_core\\runnables\\base.py\", line 3728, in invoke\n    output = {key: future.result() for key, future in zip(steps, futures)}\n             
+      ~~~~~~~~~~~~~^^\n\n\n  File \"C:\\Users\\AD54619\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\concurrent\\futures\\_base.py\", line 456, in result\n    return self.__get_result()\n           ~~~~~~~~~~~~~~~~~^^\n\n\n  File \"C:\\Users\\AD54619\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\concurrent\\futures\\_base.py\", line 401, in __get_result\n    raise self._exception\n\n\n  File \"C:\\Users\\AD54619\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\concurrent\\futures\\thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n\n\n  File \"C:\\Users\\AD54619\\Text2Sql\\virtualen\\Lib\\site-packages\\langchain_core\\runnables\\base.py\", line 3712, in _invoke_step\n    return context.run(\n           ~~~~~~~~~~~^\n        step.invoke,\n        ^^^^^^^^^^^^\n        input,\n        ^^^^^^\n        child_config,\n        ^^^^^^^^^^^^^\n    )\n    ^
