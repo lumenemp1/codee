@@ -26,3 +26,21 @@ Traceback (most recent call last):
   File "C:\Users\AD54619\Text2Sql\better_tiny.py", line 102, in main
     chain = create_sql_query_chain(llm, filtered_db, verbose=True)
 TypeError: create_sql_query_chain() got an unexpected keyword argument 'verbose'
+
+
+
+
+PS C:\Users\AD54619\Text2Sql> python better_tiny.py
+⏳ Loading TinyLlama model (HuggingFace style)...
+✅ Model loaded!
+Device set to use cpu
+
+🔹TinyLlama Chat w/ MySQL using LangChain.
+
+Type 'exit' or 'quit' to stop.
+
+User Question: employee whoose salary is more than 50000
+[DEBUG] Table Names: ['departments', 'employees']
+[DEBUG] Using these tables: ['departments', 'employees']
+
+❌ Error while generating/executing query: 'RunnableSequence' object has no attribute 'run'
