@@ -1,4 +1,296 @@
 
+PS C:\Users\AD54619\Text2Sql> python gemma_sql.py
+⏳ Loading Gemma-2B model (HuggingFace style)...
+Loading checkpoint shards: 100%|████████████████████████████████████████████████████████████| 2/2 [00:00<00:00,  3.36it/s]
+✅ Model loaded!
+Device set to use cpu
+
+🔹Gemma-2B Chat w/ MySQL using custom prompt (no chain-of-thought).
+
+Type 'exit' or 'quit' to stop.
+
+User Question: fetch details of employee belonging to sales department
+C:\Users\AD54619\Text2Sql\gemma_sql.py:126: LangChainDeprecationWarning: The method `BaseLLM.__call__` was deprecated in langchain-core 0.1.7 and will be removed in 1.0. Use :meth:`~invoke` instead.
+  result = llm(prompt)
+
+Final SQL Query:
+Generate an SQL query strictly based on the schema provided.
+
+Schema:
+Table: departments
+  - id (INTEGER)
+  - department_name (TEXT)
+  - location (TEXT)
+
+Table: employees
+  - id (INTEGER)
+  - name (TEXT)
+  - age (INTEGER)
+  - department (TEXT)
+  - salary (INTEGER)
+
+Question:
+fetch details of employee belonging to sales department
+
+Only output SQL code. Do not output any explanation or additional text.
+SQL:
+
+SELECT
+  e.id,
+  e.name,
+  e.age,
+  e.salary,
+  d.department_name
+FROM
+  employees e
+  LEFT JOIN departments d ON e.department = d.id
+WHERE
+  d.department_name ='sales'
+
+Output:
+SELECT e.id, e.name, e.age, e.salary, d.department_name FROM employees e LEFT JOIN departments d ON e.department = d.id WHERE d.department_name ='sales'
+
+
+❌ Error executing query: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'Generate an SQL query strictly based on the schema provided.\n\nSchema:\nTable: dep' at line 1")
+[SQL: Generate an SQL query strictly based on the schema provided.
+
+Schema:
+Table: departments
+  - id (INTEGER)
+  - department_name (TEXT)
+  - location (TEXT)
+
+Table: employees
+  - id (INTEGER)
+  - name (TEXT)
+  - age (INTEGER)
+  - department (TEXT)
+  - salary (INTEGER)
+
+Question:
+fetch details of employee belonging to sales department
+
+Only output SQL code. Do not output any explanation or additional text.
+SQL:
+
+SELECT
+  e.id,
+  e.name,
+  e.age,
+  e.salary,
+  d.department_name
+FROM
+  employees e
+  LEFT JOIN departments d ON e.department = d.id
+WHERE
+  d.department_name ='sales'
+
+Output:
+SELECT e.id, e.name, e.age, e.salary, d.department_name FROM employees e LEFT JOIN departments d ON e.department = d.id WHERE d.department_name ='sales']
+(Background on this error at: https://sqlalche.me/e/20/f405)
+
+User Question: get employees earning more than 20000
+
+Final SQL Query:
+SELECT *
+FROM employees
+WHERE salary > 20000;
+
+DB Results:
+(101, 'John Smith', 35, '1', 85000)
+(102, 'Sarah Johnson', 42, '2', 78000)
+(103, 'Michael Brown', 28, '1', 72000)
+(104, 'Jessica Davis', 31, '3', 90000)
+(105, 'Robert Wilson', 45, '4', 65000)
+(106, 'Lisa Anderson', 38, '5', 92000)
+(107, 'David Miller', 27, '1', 68000)
+(108, 'Jennifer Garcia', 33, '2', 71000)
+(109, 'Thomas Martinez', 41, '3', 86000)
+(110, 'Emily Rodriguez', 29, '5', 81000)
+
+User Question: get employee whose name begins with letter R 
+
+Final SQL Query:
+Generate an SQL query strictly based on the schema provided.
+
+Schema:
+Table: departments
+  - id (INTEGER)
+  - department_name (TEXT)
+  - location (TEXT)
+
+Table: employees
+  - id (INTEGER)
+  - name (TEXT)
+  - age (INTEGER)
+  - department (TEXT)
+  - salary (INTEGER)
+
+Question:
+get employee whose name begins with letter R
+
+Only output SQL code. Do not output any explanation or additional text.
+SQL:
+
+
+❌ Error executing query: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'Generate an SQL query strictly based on the schema provided.\n\nSchema:\nTable: dep' at line 1")
+[SQL: Generate an SQL query strictly based on the schema provided.
+
+Schema:
+Table: departments
+  - id (INTEGER)
+  - department_name (TEXT)
+  - location (TEXT)
+
+Table: employees
+  - id (INTEGER)
+  - name (TEXT)
+  - age (INTEGER)
+  - department (TEXT)
+  - salary (INTEGER)
+
+Question:
+get employee whose name begins with letter R
+
+Only output SQL code. Do not output any explanation or additional text.
+SQL:]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+
+User Question: get employee who belongs to finance department
+
+Final SQL Query:
+Generate an SQL query strictly based on the schema provided.
+
+Schema:
+Table: departments
+  - id (INTEGER)
+  - department_name (TEXT)
+  - location (TEXT)
+
+Table: employees
+  - id (INTEGER)
+  - name (TEXT)
+  - age (INTEGER)
+  - department (TEXT)
+  - salary (INTEGER)
+
+Question:
+get employee who belongs to finance department
+
+Only output SQL code. Do not output any explanation or additional text.
+SQL:
+
+
+❌ Error executing query: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'Generate an SQL query strictly based on the schema provided.\n\nSchema:\nTable: dep' at line 1")
+[SQL: Generate an SQL query strictly based on the schema provided.
+
+Schema:
+Table: departments
+  - id (INTEGER)
+  - department_name (TEXT)
+  - location (TEXT)
+
+Table: employees
+  - id (INTEGER)
+  - name (TEXT)
+  - age (INTEGER)
+  - department (TEXT)
+  - salary (INTEGER)
+
+Question:
+get employee who belongs to finance department
+
+Only output SQL code. Do not output any explanation or additional text.
+SQL:]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+
+User Question: get employee who earn more than 20000 incomme
+
+Final SQL Query:
+Generate an SQL query strictly based on the schema provided.
+
+Schema:
+Table: departments
+  - id (INTEGER)
+  - department_name (TEXT)
+  - location (TEXT)
+
+Table: employees
+  - id (INTEGER)
+  - name (TEXT)
+  - age (INTEGER)
+  - department (TEXT)
+  - salary (INTEGER)
+
+Question:
+get employee who earn more than 20000 incomme
+
+Only output SQL code. Do not output any explanation or additional text.
+SQL:
+
+SELECT *
+FROM employees
+WHERE salary > 20000
+
+
+❌ Error executing query: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'Generate an SQL query strictly based on the schema provided.\n\nSchema:\nTable: dep' at line 1")
+[SQL: Generate an SQL query strictly based on the schema provided.
+
+Schema:
+Table: departments
+  - id (INTEGER)
+  - department_name (TEXT)
+  - location (TEXT)
+
+Table: employees
+  - id (INTEGER)
+  - name (TEXT)
+  - age (INTEGER)
+  - department (TEXT)
+  - salary (INTEGER)
+
+Question:
+get employee who earn more than 20000 incomme
+
+Only output SQL code. Do not output any explanation or additional text.
+SQL:
+
+SELECT *
+FROM employees
+WHERE salary > 20000]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+
+User Question:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Type 'exit' or 'quit' to stop.
 
