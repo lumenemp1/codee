@@ -1,0 +1,73 @@
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
+
+# Load model with CPU optimizations
+tokenizer = AutoTokenizer.from_pretrained("suriya7/Gemma2B-Finetuned-Sql-Generator")
+model = AutoModelForCausalLM.from_pretrained(
+    "suriya7/Gemma2B-Finetuned-Sql-Generator",
+    torch_dtype=torch.float32,  # Use float32 instead of float16 for CPU
+    low_cpu_mem_usage=True
+)
+
+# Set model to evaluation mode to save memory
+model.eval()
+
+prompt_template = """
+<start_of_turn>user
+You are an intelligent AI specialized in generating SQL queries.
+Your task is to assist users in formulating SQL queries to retrieve specific information from a database.
+Please provide the SQL query corresponding to the given prompt and context:
+
+Prompt:
+find the price of laptop
+
+Context:
+CREATE TABLE products (
+    product_id INT,
+    product_name VARCHAR(100),
+    category VARCHAR(50),
+    price DECIMAL(10, 2),
+    stock_quantity INT
+);
+
+INSERT INTO products (product_id, product_name, category, price, stock_quantity) 
+VALUES 
+    (1, 'Smartphone', 'Electronics', 599.99, 100),
+    (2, 'Laptop', 'Electronics', 999.99, 50),
+    (3, 'Headphones', 'Electronics', 99.99, 200),
+    (4, 'T-shirt', 'Apparel', 19.99, 300),
+    (5, 'Jeans', 'Apparel', 49.99, 150);<end_of_turn>
+<start_of_turn>model
+"""
+
+# Tokenize with CPU in mind
+inputs = tokenizer(prompt_template, return_tensors="pt", padding=True)
+
+# Generate with conservative parameters
+with torch.no_grad():
+    # Break generation into smaller chunks to avoid memory issues
+    generated_ids = model.generate(
+        inputs["input_ids"],
+        attention_mask=inputs["attention_mask"],
+        max_new_tokens=50,  # Reduced further for CPU
+        do_sample=False,    # Set to False for faster deterministic generation
+        num_beams=1,        # No beam search for faster generation
+        pad_token_id=tokenizer.eos_token_id
+    )
+
+# Decode the result
+generated_text = tokenizer.decode(generated_ids[0], skip_special_tokens=False)
+
+# Extract model's answer
+try:
+    model_answer = generated_text.split("<start_of_turn>model")[1].split("<end_of_turn>")[0].strip()
+except IndexError:
+    # Fallback extraction method
+    parts = generated_text.split("model")
+    if len(parts) > 1:
+        model_answer = parts[1].strip()
+    else:
+        model_answer = generated_text
+
+print("Generated SQL:")
+print(model_answer)
