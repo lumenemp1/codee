@@ -1,3 +1,48 @@
+User Question: get me employee details who belong to department engineering
+Llama.generate: 201 prefix-match hit, remaining 23 prompt tokens to eval
+llama_perf_context_print:        load time =   19596.31 ms
+llama_perf_context_print: prompt eval time =    1581.68 ms /    23 tokens (   68.77 ms per token,    14.54 tokens per second)
+llama_perf_context_print:        eval time =    8347.60 ms /    64 runs   (  130.43 ms per token,     7.67 tokens per second)
+llama_perf_context_print:       total time =    9951.81 ms /    87 tokens
+
+Final SQL Query:
+```sql
+SELECT employees.id, employees.name, employees.age, departments.department_name
+FROM employees
+JOIN departments ON employees.department = departments.department_name
+```
+
+
+❌ Error executing query: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '```sql\nSELECT employees.id, employees.name, employees.age, departments.departmen' at line 1")
+[SQL: ```sql
+SELECT employees.id, employees.name, employees.age, departments.department_name
+FROM employees
+JOIN departments ON employees.department = departments.department_name
+WHERE departments.department_name = 'engineering'
+```]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+
+User Question:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 PS C:\Users\AD54619\Text2Sql> python gemma_sql.py
 ⏳ Loading Gemma-2B model (HuggingFace style)...
