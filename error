@@ -1,3 +1,16 @@
+Traceback (most recent call last):
+  File "C:\Users\AD54619\Text2Sql\approach1\new.py", line 54, in <module>
+    agent_executor = create_react_agent(llm, tools, prompt=system_prompt)
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langgraph\prebuilt\chat_agent_executor.py", line 160, in wrapper
+    return func(*args, **kwargs)
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langgraph\prebuilt\chat_agent_executor.py", line 691, in create_react_agent
+    model = cast(BaseChatModel, model).bind_tools(tool_classes)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'MistralLLM' object has no attribute 'bind_tools'
+
+
+
+
 
 
 Guessed chat format: mistral-instruct
