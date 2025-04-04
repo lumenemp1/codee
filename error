@@ -1,3 +1,44 @@
+
+C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langsmith\client.py:278: LangSmithMissingAPIKeyWarning: API key must be provided when using hosted LangSmith API
+  warnings.warn(
+Traceback (most recent call last):
+  File "C:\Users\AD54619\Text2Sql\approach1\new.py", line 54, in <module>
+    agent_executor = create_react_agent(llm, tools, prompt=system_prompt)
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langgraph\prebuilt\chat_agent_executor.py", line 160, in wrapper
+    return func(*args, **kwargs)
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langgraph\prebuilt\chat_agent_executor.py", line 691, in create_react_agent
+    model = cast(BaseChatModel, model).bind_tools(tool_classes)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'MistralLLM' object has no attribute 'bind_tools'
+PS C:\Users\AD54619\Text2Sql\approach1> python new.py
+Traceback (most recent call last):
+  File "C:\Users\AD54619\Text2Sql\approach1\new.py", line 46, in <module>
+    llm = MistralLLM(model_path=MODEL_PATH)
+TypeError: Can't instantiate abstract class MistralLLM without an implementation for abstract methods '_generate', '_llm_type'
+PS C:\Users\AD54619\Text2Sql\a
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Traceback (most recent call last):
   File "C:\Users\AD54619\Text2Sql\approach1\new.py", line 54, in <module>
     agent_executor = create_react_agent(llm, tools, prompt=system_prompt)
