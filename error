@@ -1,4 +1,40 @@
 
+
+Guessed chat format: mistral-instruct
+Traceback (most recent call last):
+  File "C:\Users\AD54619\Text2Sql\approach1\new.py", line 50, in <module>
+    llm = MistralLLM(model_path=MODEL_PATH)
+  File "C:\Users\AD54619\Text2Sql\approach1\new.py", line 31, in __init__
+    self.llama = Llama(
+    ^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\pydantic\main.py", line 990, in __setattr__
+    elif (setattr_handler := self._setattr_handler(name, value)) is not None:
+                             ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\pydantic\main.py", line 1037, in _setattr_handler
+    raise ValueError(f'"{cls.__name__}" object has no field "{name}"')
+ValueError: "MistralLLM" object has no field "llama"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langsmith\client.py:278: LangSmithMissingAPIKeyWarning: API key must be provided when using hosted LangSmith API
   warnings.warn(
 Traceback (most recent call last):
