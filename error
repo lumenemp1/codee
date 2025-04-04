@@ -1,3 +1,56 @@
+PS C:\Users\AD54619\Text2Sql\approach1> python new.py
+⏳ Loading Mistral 7B model via llama.cpp...
+Traceback (most recent call last):
+  File "C:\Users\AD54619\Text2Sql\approach1\new.py", line 58, in <module>
+    llm = MistralLLM(model_path=MODEL_PATH)
+  File "C:\Users\AD54619\Text2Sql\approach1\new.py", line 29, in __init__
+    self.verbose = verbose  # ✅ Fix: Add this line
+    ^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\pydantic\main.py", line 991, in __setattr__
+    setattr_handler(self, name, value)  # call here to not memo on possibly unknown fields
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\pydantic\main.py", line 99, in _model_field_setattr_handler  
+    model.__pydantic_fields_set__.add(name)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\approach1\new.py", line 53, in __getattr__
+    raise AttributeError(f"{type(self).__name__!r} object has no attribute {name!r}")
+AttributeError: 'MistralLLM' object has no attribute '__pydantic_fields_set__'. Did you mean: '__pydantic_fields__'? 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 🧠 Step: get me list of all customers
 Traceback (most recent call last):
   File "C:\Users\AD54619\Text2Sql\approach1\new.py", line 85, in <module>
