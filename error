@@ -1,3 +1,36 @@
+POST https://localhost:5000/api/query
+Error: write EPROTO 54290880:error:100000f7:SSL routines:OPENSSL_internal:WRONG_VERSION_NUMBER:..\..\..\..\src\third_party\boringssl\src\ssl\tls_record.cc:231:
+Request Headers
+Content-Type: application/json
+User-Agent: PostmanRuntime/7.43.0
+Accept: */*
+Postman-Token: 90760198-d809-4294-951b-93166c45efd1
+Host: localhost:5000
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Request Body
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 User Question: get me employee details who belong to department engineering
 Llama.generate: 201 prefix-match hit, remaining 23 prompt tokens to eval
 llama_perf_context_print:        load time =   19596.31 ms
