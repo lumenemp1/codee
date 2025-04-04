@@ -1,3 +1,95 @@
+🧠 Step: list all customers
+Traceback (most recent call last):
+  File "C:\Users\AD54619\Text2Sql\approach1\new.py", line 82, in <module>
+    chat()
+    ~~~~^^
+  File "C:\Users\AD54619\Text2Sql\approach1\new.py", line 78, in chat
+    for step in agent_executor.stream({"messages": [HumanMessage(content=user_input)]}, stream_mode="values"):
+                ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langgraph\pregel\__init__.py", line 2340, in stream
+    for _ in runner.tick(
+             ~~~~~~~~~~~^
+        loop.tasks.values(),
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        get_waiter=get_waiter,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    ):
+    ^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langgraph\pregel\runner.py", line 158, in tick
+    run_with_retry(
+    ~~~~~~~~~~~~~~^
+        t,
+        ^^
+    ...<11 lines>...
+        },
+        ^^
+    )
+    ^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langgraph\pregel\retry.py", line 40, in run_with_retry       
+    return task.proc.invoke(task.input, config)
+           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langgraph\utils\runnable.py", line 606, in invoke
+    input = step.invoke(input, config, **kwargs)
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langgraph\utils\runnable.py", line 363, in invoke
+    ret = context.run(self.func, *args, **kwargs)
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langgraph\prebuilt\chat_agent_executor.py", line 745, in call_model
+    response = cast(AIMessage, model_runnable.invoke(state, config))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\runnables\base.py", line 3025, in invoke      
+    input = context.run(step.invoke, input, config)
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\language_models\chat_models.py", line 307, in invoke
+    self.generate_prompt(
+    ~~~~~~~~~~~~~~~~~~~~^
+        [self._convert_input(input)],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    ).generations[0][0],
+    ^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\language_models\chat_models.py", line 843, in generate_prompt
+    return self.generate(prompt_messages, stop=stop, callbacks=callbacks, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\language_models\chat_models.py", line 663, in generate
+    self.callbacks,
+    ^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\pydantic\main.py", line 984, in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+AttributeError: 'MistralLLM' object has no attribute 'callbacks'
+During task with name 'agent' and id 'd47a6d5a-987a-ea77-1805-3ebbd8e47d2d'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 be provided when using hosted LangSmith API
   warnings.warn(
 Traceback (most recent call last):
