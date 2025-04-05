@@ -1,3 +1,105 @@
+
+User Query: hello i want orders which are cancelled
+Llama.generate: 676 prefix-match hit, remaining 12 prompt tokens to eval
+llama_perf_context_print:        load time =   61542.72 ms
+llama_perf_context_print: prompt eval time =     985.22 ms /    12 tokens (   82.10 ms per token,    12.18 tokens per second)
+llama_perf_context_print:        eval time =    9462.99 ms /    66 runs   (  143.38 ms per token,     6.97 tokens per second)
+llama_perf_context_print:       total time =   10473.24 ms /    78 tokens
+
+LLM Response (raw):
+{
+  "source_system": "EON",
+  "order_type": "ALL",
+  "order_status": "cancelled",
+  "order_action": "ALL",
+  "start_date": "none",
+  "end_date": "now"
+}
+
+llama_perf_context_print:       total time =   10473.24 ms /    78 tokens
+
+LLM Response (raw):
+{
+  "source_system": "EON",
+  "order_type": "ALL",
+  "order_status": "cancelled",
+  "order_action": "ALL",
+  "start_date": "none",
+  "end_date": "now"
+}
+
+LLM Response (raw):
+{
+  "source_system": "EON",
+  "order_type": "ALL",
+  "order_status": "cancelled",
+  "order_action": "ALL",
+  "start_date": "none",
+  "end_date": "now"
+}
+
+  "source_system": "EON",
+  "order_type": "ALL",
+  "order_status": "cancelled",
+  "order_action": "ALL",
+  "start_date": "none",
+  "end_date": "now"
+}
+
+  "order_type": "ALL",
+  "order_status": "cancelled",
+  "order_action": "ALL",
+  "start_date": "none",
+  "end_date": "now"
+}
+
+  "order_action": "ALL",
+  "start_date": "none",
+  "end_date": "now"
+}
+
+  "start_date": "none",
+  "end_date": "now"
+}
+
+  "end_date": "now"
+}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 PS C:\Users\AD54619\Text2Sql\approach1> python new.py
 ⏳ Loading Mistral 7B model via llama.cpp...
 Traceback (most recent call last):
