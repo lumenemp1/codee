@@ -1,3 +1,177 @@
+
+Application bundle generation failed. [2.648 seconds]
+
+▲ [WARNING] NG8103: The `*ngFor` directive was used in the template, but neither the `NgFor` directive nor the `CommonModule` was imported. Use Angular's built-in control flow @for or make sure that either the `NgFor` directive or the `CommonModule` is included in the `@Component.imports` array of this component. [plugin angular-compiler]
+
+    src/app/app.component.html:5:10:
+      5 │     <div *ngFor="let msg of messages">
+        ╵           ~~~~~
+
+  Error occurs in the template of component AppComponent.
+
+    src/app/app.component.ts:13:15:
+      13 │   templateUrl: './app.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~
+
+
+▲ [WARNING] NG8103: The `*ngIf` directive was used in the template, but neither the `NgIf` directive nor the `CommonModule` was imported. Use Angular's built-in control flow @if or make sure that either the `NgIf` directive or the `CommonModule` is included in the `@Component.imports` array of this component. [plugin angular-compiler]
+
+    src/app/app.component.html:6:29:
+      6 │       <div class="user-msg" *ngIf="msg.role === 'user'">You: {{ msg...
+        ╵                              ~~~~
+
+  Error occurs in the template of component AppComponent.
+
+    src/app/app.component.ts:13:15:
+      13 │   templateUrl: './app.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~
+
+
+▲ [WARNING] NG8103: The `*ngIf` directive was used in the template, but neither the `NgIf` directive nor the `CommonModule` was imported. Use Angular's built-in control flow @if or make sure that either the `NgIf` directive or the `CommonModule` is included in the `@Component.imports` array of this component. [plugin angular-compiler]
+
+    src/app/app.component.html:8:28:
+      8 │       <div class="bot-msg" *ngIf="msg.role === 'bot'">
+        ╵                             ~~~~
+
+  Error occurs in the template of component AppComponent.
+
+    src/app/app.component.ts:13:15:
+      13 │   templateUrl: './app.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~
+
+
+▲ [WARNING] NG8103: The `*ngIf` directive was used in the template, but neither the `NgIf` directive nor the `CommonModule` was imported. Use Angular's built-in control flow @if or make sure that either the `NgIf` directive or the `CommonModule` is included in the `@Component.imports` array of this component. [plugin angular-compiler]
+
+    src/app/app.component.html:12:16:
+      12 │         <table *ngIf="msg.results?.length">
+         ╵                 ~~~~
+
+  Error occurs in the template of component AppComponent.
+
+    src/app/app.component.ts:13:15:
+      13 │   templateUrl: './app.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~
+
+
+▲ [WARNING] NG8103: The `*ngFor` directive was used in the template, but neither the `NgFor` directive nor the `CommonModule` was imported. Use Angular's built-in control flow @for or make sure that either the `NgFor` directive or the `CommonModule` is included in the `@Component.imports` array of this component. [plugin angular-compiler]
+
+    src/app/app.component.html:15:19:
+      15 │               <th *ngFor="let key of getKeys(msg.results[0])">{{ k...
+         ╵                    ~~~~~
+
+  Error occurs in the template of component AppComponent.
+
+    src/app/app.component.ts:13:15:
+      13 │   templateUrl: './app.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~
+
+
+▲ [WARNING] NG8103: The `*ngFor` directive was used in the template, but neither the `NgFor` directive nor the `CommonModule` was imported. Use Angular's built-in control flow @for or make sure that either the `NgFor` directive or the `CommonModule` is included in the `@Component.imports` array of this component. [plugin angular-compiler]
+
+    src/app/app.component.html:19:17:
+      19 │             <tr *ngFor="let row of msg.results">
+         ╵                  ~~~~~
+
+  Error occurs in the template of component AppComponent.
+
+    src/app/app.component.ts:13:15:
+      13 │   templateUrl: './app.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~
+
+
+▲ [WARNING] NG8103: The `*ngFor` directive was used in the template, but neither the `NgFor` directive nor the `CommonModule` was imported. Use Angular's built-in control flow @for or make sure that either the `NgFor` directive or the `CommonModule` is included in the `@Component.imports` array of this component. [plugin angular-compiler]
+
+    src/app/app.component.html:20:19:
+      20 │               <td *ngFor="let key of getKeys(row)">{{ row[key] }}<...
+         ╵                    ~~~~~
+
+  Error occurs in the template of component AppComponent.
+
+    src/app/app.component.ts:13:15:
+      13 │   templateUrl: './app.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG8002: Can't bind to 'ngModel' since it isn't a known property of 'input'. [plugin angular-compiler]
+
+    src/app/app.component.html:29:11:
+      29 │     <input [(ngModel)]="userInput" placeholder="Ask your question....
+         ╵            ~~~~~~~~~~~~~~~~~~~~~~~
+
+  Error occurs in the template of component AppComponent.
+
+    src/app/app.component.ts:13:15:
+      13 │   templateUrl: './app.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~
+
+
+Watch mode enabled. Watching for file changes...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 User Query: give me eon orders from 9am to 12pm on 1st june 2015
 Llama.generate: 1 prefix-match hit, remaining 788 prompt tokens to eval
 llama_perf_context_print:        load time =    1240.90 ms
