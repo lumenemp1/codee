@@ -1,3 +1,343 @@
+ok lets do this functionality . create functions 
+step 1 i want the user to like upload a csv file from CMD
+step 2 the csv file gets converted into this GRAPH DB ( stored in GRAPH DB )
+Step 3 i have a mistral model which runs locally it should dynamically know the schema of the GRAPH DB and make a cyper query according to the question asked by the user on the csv 
+step 4 run the cypher query , fetch the results
+step 5 . display the results 
+
+import pandas as pd
+from neo4j import GraphDatabase
+from llama_cpp import Llama
+ 
+# === Neo4j Configuration ===
+NEO4J_URI = "bolt://localhost:7687"
+NEO4J_USER = "neo4j"
+NEO4J_PASSWORD = "your_password"  # Replace with your actual password
+ 
+# === Load CSV ===
+def load_csv(file_path):
+    df = pd.read_csv(file_path)
+    df.columns = [col.strip().replace(" ", "_") for col in df.columns]
+    print("[INFO] CSV Loaded. Columns:", list(df.columns))
+    return df
+ 
+# === Infer Simple Schema ===
+def infer_schema(df):
+    node1, node2 = df.columns[0], df.columns[1]
+    rel_prop = df.columns[2] if len(df.columns) > 2 else None
+    return {
+        "node1": node1,
+        "node2": node2,
+        "rel_type": "RELATED_TO",
+        "rel_prop": rel_prop
+    }
+ 
+# === Insert Data into Neo4j ===
+def insert_into_neo4j(df, schema):
+    driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
+    with driver.session() as session:
+        for _, row in df.iterrows():
+            props = f"{{{schema['rel_prop']}: '{row[schema['rel_prop']]}'}}" if schema['rel_prop'] else ""
+            cypher = f"""
+            MERGE (a:{schema['node1']} {{name: $a_name}})
+            MERGE (b:{schema['node2']} {{name: $b_name}})
+            MERGE (a)-[:{schema['rel_type']} {props}]->(b)
+            """
+            session.run(
+                cypher,
+                a_name=str(row[schema['node1']]),
+                b_name=str(row[schema['node2']])
+            )
+    print("[INFO] Data inserted into Neo4j.")
+ 
+# === Prompt Builder for Mistral ===
+def build_prompt(schema, question):
+    return f"""You are a Cypher expert working with a Neo4j graph database.
+Graph Schema:
+(:{schema['node1']})-[:{schema['rel_type']}]->(:{schema['node2']})
+Properties:
+- {schema['node1']}: name
+- {schema['node2']}: name
+- {schema['rel_type']}: {schema['rel_prop']}
+ 
+Examples:
+Q: What did Alice buy?
+A: MATCH (a:{schema['node1']} {{name: "Alice"}})-[:{schema['rel_type']}]->(b:{schema['node2']}) RETURN b.name
+Q: {question}
+A:"""
+ 
+# === Query Mistral via llama-cpp ===
+llm = Llama(
+    model_path="mistral-7b-instruct-v0.2.Q4_K_M.gguf",
+    n_ctx=2048,
+    n_threads=6,
+    verbose=True
+)
+ 
+def query_mistral(prompt):
+    output = llm(prompt, max_tokens=200, stop=["\n\n", "\nQ:"], echo=False)
+    return output["choices"][0]["text"].strip()
+ 
+# === Execute Cypher Query ===
+def run_cypher_query(cypher):
+    driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
+    with driver.session() as session:
+        result = session.run(cypher)
+        return [record.values() for record in result]
+ 
+# === Main ===
+def main():
+    csv_path = input("Enter full path of your CSV file (or just filename if it's in the same folder): ")
+    df = load_csv(csv_path)
+    schema = infer_schema(df)
+    insert_into_neo4j(df, schema)
+ 
+    while True:
+        question = input("\nAsk a question (or type 'exit' to quit): ")
+        if question.lower() == 'exit':
+            break
+        prompt = build_prompt(schema, question)
+        print("\n[DEBUG] Prompt sent to Mistral:\n", prompt)
+        cypher = query_mistral(prompt)
+        print("\n[DEBUG] Cypher generated:\n", cypher)
+        results = run_cypher_query(cypher)
+        print("Answer:", results)
+ 
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Application bundle generation failed. [2.648 seconds]
 
