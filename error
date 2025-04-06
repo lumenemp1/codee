@@ -1,3 +1,46 @@
+[DEBUG] Cypher generated:
+
+```cypher
+
+MATCH (c:Customer)-[:RELATED_TO]->(i:Index)
+
+WHERE i.Country = 'bhutan'
+
+RETURN c.Customer_Id AS id, c.First_Name AS name
+
+```
+
+This query will return the Customer nodes that have a relationship `RELATED_TO` to an Index node with the property `Country` equal to 'bhutan'. The results will include the `Customer_Id` and `First_Name` properties of the Customer node.
+
+[ERROR] Cypher query failed: {code: Neo.ClientError.Statement.SyntaxError} {message: Invalid input '```cypher\nMATCH (c:Customer)-[:RELATED_TO]->(i:Index)\nWHERE i.Country = 'bhutan'\nRETURN c.Customer_Id AS id, c.First_Name AS name\n```': expected 'FOREACH', 'ALTER', 'ORDER BY', 'CALL', 'USING PERIODIC COMMIT', 'CREATE', 'LOAD CSV', 'START DATABASE', 'STOP DATABASE', 'DEALLOCATE', 'DELETE', 'DENY', 'DETACH', 'DROP', 'DRYRUN', 'FINISH', 'GRANT', 'INSERT', 'LIMIT', 'MATCH', 'MERGE', 'NODETACH', 'OFFSET', 'OPTIONAL', 'REALLOCATE', 'REMOVE', 'RENAME', 'RETURN', 'REVOKE', 'ENABLE SERVER', 'SET', 'SHOW', 'SKIP', 'TERMINATE', 'UNWIND', 'USE' or 'WITH' (line 1, column 1 (offset: 0))
+
+"```cypher"
+
+^}
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ok lets do this functionality . create functions 
 step 1 i want the user to like upload a csv file from CMD
 step 2 the csv file gets converted into this GRAPH DB ( stored in GRAPH DB )
