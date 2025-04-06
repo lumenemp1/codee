@@ -1,3 +1,38 @@
+User Query: give me eon orders from 9am to 12pm on 1st june 2015
+Llama.generate: 1 prefix-match hit, remaining 788 prompt tokens to eval
+llama_perf_context_print:        load time =    1240.90 ms
+llama_perf_context_print: prompt eval time =   80236.62 ms /   788 tokens (  101.82 ms per token,     9.82 tokens per second)
+llama_perf_context_print:        eval time =   16153.41 ms /    99 runs   (  163.17 ms per token,     6.13 tokens per second)
+llama_perf_context_print:       total time =   96451.71 ms /   887 tokens
+
+
+User Query: give me the orders of eon from 9am -12pm on 1st june2015
+Llama.generate: 761 prefix-match hit, remaining 28 prompt tokens to eval
+llama_perf_context_print:        load time =    1240.90 ms
+llama_perf_context_print: prompt eval time =    2154.85 ms /    28 tokens (   76.96 ms per token,    12.99 tokens per second)
+llama_perf_context_print:        eval time =   12370.32 ms /    92 runs   (  134.46 ms per token,     7.44 tokens per second)
+llama_perf_context_print:       total time =   14563.50 ms /   120 tokens
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 select DISTINCT si.order_no ,si.item_no ,ii.action as 'Order Action',oo.order_type as 'Order Type',sca.account_no as 'BAN',sca.account_name as 'CustName',
 itc.description ,psp.sub_profile_desc, si.circuit_id as 'FroId', scp.cpi_status_code as 'Circuit Status',     	
 case when sva.cust_site_id != 'null' then  aa.address + '  '+ aa.city + ' '+ aa.state + ' '+ aa.country else '' end as 'Customer Prem Address A',  
