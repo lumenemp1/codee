@@ -1,4 +1,41 @@
 [DEBUG] Cypher generated:
+MATCH (customer:Customer)-[:RELATED_TO]->(index:Index)
+WHERE index.Country='Bhutan'
+RETURN customer.Customer_Id AS CustomerId, customer.First_Name AS FirstName
+ORDER BY customer.First_Name ASC
+```
+This Cypher query searches for customers by following the `RELATED_TO` relationship from the `Index` node and filters the result by the country property equal to 'Bhutan'. It then returns the `CustomerId` and `FirstName` properties of the matching `Customer` nodes in an ascending order by their `FirstName` property.
+[ERROR] Cypher query failed: {code: Neo.ClientError.Statement.SyntaxError} {message: Invalid input '```\nThis Cypher query searches for customers by following the `': expected 'FOREACH', ',', 'ORDER BY', 'CALL', 'CREATE', 'LOAD CSV', 'DELETE', 'DETACH', 'FINISH', 'INSERT', 'LIMIT', 'MATCH', 'MERGE', 'NODETACH', 'OFFSET', 'OPTIONAL', 'REMOVE', 'RETURN', 'SET', 'SKIP', 'UNION', 'UNWIND', 'USE', 'WITH' or <EOF> (line 5, column 1 (offset: 193))
+"```"
+^}
+Answer: []
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[DEBUG] Cypher generated:
 
 ```cypher
 
