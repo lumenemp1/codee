@@ -1,3 +1,515 @@
+import os
+import sys
+from typing import Optional
+import logging
+import re
+
+# Disable LangChain debug logs
+logging.getLogger("langchain").setLevel(logging.ERROR)
+import langchain
+langchain.debug = False
+
+# Import LangChain Community utilities and (we no longer use HuggingFacePipeline)
+from langchain_community.utilities import SQLDatabase
+
+from sqlalchemy import create_engine, inspect, text
+
+import torch
+# We no longer use transformers for model loading
+
+# ----- New: Use Mistral-7B-Instruct-v0-2.Q4_km.gguf via llama-cpp-python -----
+from llama_cpp import Llama
+
+# Define a wrapper so our LLM interface remains the same:
+class MistralLLM:
+    def __init__(self, model_path: str, n_ctx: int, n_threads: int, verbose: bool):
+        print("⏳ Loading Mistral-7B-Instruct model (llama-cpp)...")
+        self.llama = Llama(
+            model_path=model_path,
+            n_ctx=n_ctx,
+            n_threads=n_threads,
+            verbose=verbose
+        )
+        print("✅ Model loaded!")
+    
+    def __call__(self, prompt: str) -> str:
+        # Call the model and return the generated text.
+        output = self.llama(
+            prompt,
+            max_tokens=512,
+            stop=["</s>","SQL:"])
+        # Expecting output in the form: {"choices": [{"text": "..."}], ...}
+        return output["choices"][0]["text"].strip()
+
+# Set your model path and parameters here:
+SQLCODER_MODEL_PATH = "sqlcoder-7b-2.Q4_K_M.gguf"  # replace with your actual file name
+
+def load_sqlcoder_llm():
+    return MistralLLM(
+        model_path=SQLCODER_MODEL_PATH,  # same wrapper class
+        n_ctx=2048,                      # or 1024 if you want smaller context
+        n_threads=6,                     # match your CPU cores
+        verbose=False
+    )
+
+def pick_tables(question: str, all_tables: list, llm) -> list:
+    """
+    Uses the LLM to intelligently select relevant tables from the available list,
+    based on the user's natural language question.
+    """
+    prompt = (
+        "Given the following list of database tables:\n"
+        f"{', '.join(all_tables)}\n\n"
+        f"And the user's question:\n\"{question}\"\n\n"
+        "Return the names of the most relevant tables from the list. "
+        "Only return a comma-separated list of table names. Do not include any explanation or extra text.\n"
+    )
+
+    try:
+        response = llm(prompt)
+        selected = [t.strip() for t in response.split(",") if t.strip() in all_tables]
+        return selected or all_tables[:3]  # fallback if model gives invalid output
+    except Exception as e:
+        print(f"⚠️ LLM table selection failed: {e}")
+        return all_tables[:3]
+
+def get_schema_text(db: SQLDatabase, db_uri: str) -> str:
+    """
+    Build a compact, LLM-optimized schema representation for SQL generation.
+    Includes the initially selected tables and any 1-hop foreign key-related tables.
+    """
+    engine = create_engine(db_uri)
+    inspector = inspect(engine)
+
+    # Start with tables included in the filtered DB
+    initial_tables = set(db.get_usable_table_names())
+    all_tables_to_include = set(initial_tables)
+
+    # Step 1: Add 1-hop foreign key related tables
+    for tbl in initial_tables:
+        try:
+            fks = inspector.get_foreign_keys(tbl)
+            for fk in fks:
+                referred_table = fk.get("referred_table")
+                if referred_table:
+                    all_tables_to_include.add(referred_table)
+        except Exception:
+            continue  # skip faulty FKs
+
+    lines = []
+
+    # Step 2: Format schema for all included tables
+    for tbl in sorted(all_tables_to_include):
+        try:
+            cols = inspector.get_columns(tbl)
+            col_defs = [f"{col['name']} {col['type']}" for col in cols]
+            col_str = ", ".join(col_defs)
+            lines.append(f"TABLE {tbl} ({col_str})")
+        except Exception:
+            lines.append(f"TABLE {tbl} ([Error reading columns])")
+
+        try:
+            fks = inspector.get_foreign_keys(tbl)
+            for fk in fks:
+                for col, ref_col in zip(fk.get("constrained_columns", []), fk.get("referred_columns", [])):
+                    referred_table = fk.get("referred_table", "Unknown")
+                    lines.append(f"FK {tbl}.{col} -> {referred_table}.{ref_col}")
+        except Exception:
+            lines.append(f"# [Error reading foreign keys for {tbl}]")
+
+        lines.append("")  # Add a blank line between tables
+
+    return "\n".join(lines).strip()
+
+
+def extract_sql_query(text: str) -> str:
+    """
+    Extracts the SQL query from the model's response.
+    Removes ```sql blocks and grabs the first valid SQL statement.
+    """
+    # Remove markdown-style SQL code block (```sql ... ```)
+    text = text.strip()
+    if text.startswith("```sql"):
+        text = text.removeprefix("```sql").strip()
+    if text.endswith("```"):
+        text = text.removesuffix("```").strip()
+
+    # Now extract the actual SQL query
+    pattern = re.compile(r"(?i)(SELECT|INSERT|UPDATE|DELETE).*?;", re.DOTALL)
+    match = pattern.search(text)
+    if match:
+        return match.group(0).strip()
+    else:
+        return text.strip()
+def generate_sql_custom(question: str, schema_text: str, llm) -> str:
+    """
+    Manually constructs a prompt (similar to your base version) and uses the LLM
+    to generate a SQL query.
+    """
+    prompt = (
+        "Generate an SQL query strictly based on the schema provided.\n\n"
+        f"Schema:\n{schema_text}\n\n"
+        f"Question:\n{question}\n\n"
+        "Only output SQL code. Do not output any explanation or additional text.\n"
+        "SQL:"
+    )
+    result = llm(prompt)
+    return result.strip()
+
+from langchain_community.utilities import SQLDatabase
+from sqlalchemy import create_engine, text
+
+
+# ------------------------------------------------------------------
+# Helper: run SQL and capture errors
+# ------------------------------------------------------------------
+def execute_sql(sql: str, db_uri: str):
+    try:
+        engine = create_engine(db_uri)
+        with engine.connect() as conn:
+            rows = conn.execute(text(sql)).fetchall()
+        rows = [dict(r._mapping) for r in rows]
+        return {"rows": rows}                # success
+    except Exception as e:
+        return {"error": str(e)}             # failure
+
+
+# ------------------------------------------------------------------
+# Main pipeline with single automatic retry
+# ------------------------------------------------------------------
+def process_question(question: str, db_uri: str, llm, max_retry: int = 1) -> dict:
+    """
+    1. Pick tables
+    2. Build schema
+    3. Ask LLM for SQL
+    4. Execute SQL
+    5. If DB error, ask LLM once more to fix it (bounded retry)
+    Returns: {sql: str, results: list[dict]}  OR  {sql: str, error: str}
+    """
+
+    # ----- table discovery -----
+    wide_db = SQLDatabase.from_uri(db_uri)
+    all_table_names = wide_db.get_usable_table_names()
+    relevant_tables = pick_tables(question, all_table_names, llm)   # <- fixed var
+
+    # ----- schema text -----
+    filtered_db = SQLDatabase.from_uri(db_uri, include_tables=relevant_tables)
+    schema_text = get_schema_text(filtered_db, db_uri)
+
+    # ----- first SQL generation -----
+    sql = extract_sql_query(
+        generate_sql_custom(question, schema_text, llm)
+    )
+
+    # ----- try executing -----
+    result = execute_sql(sql, db_uri)
+
+    # ----- automatic single retry if error -----
+    if "error" in result and max_retry > 0:
+        retry_prompt = (
+            f"You generated this SQL:\n{sql}\n\n"
+            f"It failed with this error:\n{result['error']}\n\n"
+            f"Schema:\n{schema_text}\n\n"
+            "Please correct the SQL. Output only SQL code."
+        )
+        fixed_sql = extract_sql_query(llm(retry_prompt))
+        retry_out = execute_sql(fixed_sql, db_uri)
+
+        # overwrite if second attempt succeeded (or keep final error)
+        sql = fixed_sql
+        result = retry_out
+
+    # ----- build response -----
+    if "rows" in result:
+        return {"sql": sql, "results": result["rows"]}
+    else:
+        return {"sql": sql, "error": result["error"]}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 [DEBUG] Cypher generated:
 MATCH (customer:Customer)-[:RELATED_TO]->(index:Index)
 WHERE index.Country='Bhutan'
