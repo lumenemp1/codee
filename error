@@ -1,3 +1,289 @@
+No SQL generated
+Error: (pymysql.err.OperationalError) (1065, 'Query was empty') (Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+
+from llama_cpp import Llama
+
+def main():
+    # Hardcoded model path and parameters
+    MODEL_PATH = "sqlcoder-7b-2.Q4_K_M.gguf"  # REPLACE THIS WITH YOUR ACTUAL MODEL PATH
+    N_CTX = 2048
+    N_THREADS = 6
+    VERBOSE = True
+    
+    # Initialize the model with optimal settings for performance
+    print(f"Loading model from {MODEL_PATH}...")
+    model = Llama(
+        model_path=MODEL_PATH,
+        n_gpu_layers=0,      # CPU only
+        n_ctx=N_CTX,         # Context size
+        n_threads=N_THREADS, # CPU threads
+        verbose=VERBOSE,
+        n_batch=512,         # Batch size for more efficient processing
+        use_mlock=True,      # Lock memory to prevent swapping
+        use_mmap=True,       # Use memory mapping for faster loading
+        logits_all=False     # Only compute logits for the last token
+    )
+    print("Model loaded successfully!")
+
+    # Sample table schema
+    table_schema = """
+
+
+
+    # SQLCoder prompt template
+    prompt_template = """### Task
+Generate a SQL query to answer the following question:
+{question}
+
+### Database Schema
+The query will run on a database with the following schema:
+{schema}
+
+### SQL Query
+```sql
+"""
+
+    while True:
+        try:
+            # Get user question
+            user_question = input("\nEnter your question (or 'exit' to quit): ")
+            if user_question.lower() in ['exit', 'quit']:
+                break
+
+            # Format the prompt
+            prompt = prompt_template.format(
+                question=user_question,
+                schema=table_schema
+            )
+
+            # Generate SQL query with streaming for better UX
+            print("\nGenerating SQL query...")
+            
+            print("\n--- Generated SQL Query ---")
+            
+            # Stream the response for better UX and automatic KV caching
+            response = ""
+            for chunk in model.create_completion(
+                prompt,
+                max_tokens=512,
+                stop=["```"],
+                echo=False,
+                temperature=0.1,
+                stream=True
+            ):
+                piece = chunk["choices"][0]["text"]
+                response += piece
+                print(piece, end="", flush=True)
+            
+            print("\n---------------------------")
+
+        except KeyboardInterrupt:
+            print("\nExiting...")
+            break
+        except Exception as e:
+            print(f"Error: {str(e)}")
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Available chat formats from metadata: chat_template.default
 Guessed chat format: mistral-instruct
 ✅ Model loaded!
