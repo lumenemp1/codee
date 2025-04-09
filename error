@@ -1,3 +1,97 @@
+
+PS C:\Users\AD54619\Text2Sql\Sqlcoder> python search_schema.py
+
+🔍 Enter your natural-language question (type 'exit' to quit):
+
+❓ Your question: which table stores information  about customers
+Traceback (most recent call last):
+  File "C:\Users\AD54619\Text2Sql\Sqlcoder\search_schema.py", line 55, in <module>
+    interactive_loop()
+    ~~~~~~~~~~~~~~~~^^
+  File "C:\Users\AD54619\Text2Sql\Sqlcoder\search_schema.py", line 45, in interactive_loop
+    results = get_top_k_tables(query, index, metadata, embed_model, top_k=3)
+  File "C:\Users\AD54619\Text2Sql\Sqlcoder\search_schema.py", line 16, in get_top_k_tables
+    D, I = index.search([query_embedding], top_k)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\faiss\class_wrappers.py", line 327, in replacement_search
+    n, d = x.shape
+           ^^^^^^^
+AttributeError: 'list' object has no attribute 'shape'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 No SQL generated
 Error: (pymysql.err.OperationalError) (1065, 'Query was empty') (Background on this error at: https://sqlalche.me/e/20/e3q8)
 
