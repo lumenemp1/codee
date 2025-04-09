@@ -1,3 +1,18 @@
+
+
+
+
+
+No SQL generated
+Error: (pymysql.err.OperationalError) (1065, 'Query was empty') (Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+
+
+
+
+
+
+
 import os
 import sys
 from typing import Optional
