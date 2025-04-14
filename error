@@ -1,3 +1,729 @@
+import os
+import sys
+from typing import Optional
+import logging
+import json
+from datetime import datetime, timedelta
+
+# Disable LangChain debug logs
+logging.getLogger("langchain").setLevel(logging.ERROR)
+
+# Database and LangChain imports
+from langchain_community.utilities import SQLDatabase
+from langchain_community.tools import QuerySQLDatabaseTool
+from langchain_huggingface import HuggingFacePipeline
+from langchain_community.agent_toolkits.sql.base import create_sql_agent
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+
+from sqlalchemy import create_engine, text
+import langchain
+langchain.debug = False  # Disable debug logging
+
+# Model imports
+import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+
+# Configuration
+MODEL_NAME = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+DB_CONFIG = {
+    "user": "root",
+    "password": "admin",
+    "host": "localhost",
+    "port": 3306,
+    "database": "chatbot"
+}
+
+def load_tinyllama_model():
+    """Load the TinyLlama model for text generation."""
+    print("⏳ Loading TinyLlama model...")
+    
+    # Load tokenizer and model
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+    
+    # Check for GPU availability
+    if torch.cuda.is_available():
+        print("🚀 Using GPU for inference")
+        model = AutoModelForCausalLM.from_pretrained(
+            MODEL_NAME,
+            torch_dtype=torch.float16,
+            device_map="auto"
+        )
+    else:
+        print("⚙️ Using CPU for inference")
+        model = AutoModelForCausalLM.from_pretrained(MODEL_NAME)
+        
+    print("✅ Model loaded!")
+    
+    # Create text generation pipeline with proper settings
+    hf_pipe = pipeline(
+        "text-generation",
+        model=model,
+        tokenizer=tokenizer,
+        max_new_tokens=256,
+        do_sample=True,  # Enable sampling for temperature and top_p to work
+        temperature=0.7,
+        top_p=0.9,
+        pad_token_id=tokenizer.eos_token_id,
+    )
+    
+    # Wrap in LangChain format
+    return HuggingFacePipeline(pipeline=hf_pipe)
+
+def get_db_connection():
+    """Create a database connection string and SQLDatabase object."""
+    db_uri = f"mysql+pymysql://{DB_CONFIG['user']}:{DB_CONFIG['password']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['database']}"
+    return db_uri
+
+def select_relevant_tables(question, all_tables):
+    """Select tables that might be relevant to the question."""
+    question_lower = question.lower()
+    
+    # First try exact matches
+    relevant = [t for t in all_tables if t.lower() in question_lower]
+    
+    # If no matches, use keyword mapping
+    if not relevant:
+        keywords = {
+            "order": ["orders", "order_details"],
+            "product": ["products", "inventory_transactions"],
+            "customer": ["customers"],
+            "inventory": ["inventory_transactions", "products"],
+            "purchase": ["orders", "order_details"],
+            "buy": ["orders", "order_details"],
+            "ship": ["orders"],
+            "deliver": ["orders"],
+            "sale": ["orders", "order_details"],
+            "payment": ["orders"],
+            "stock": ["inventory_transactions", "products"]
+        }
+        
+        for keyword, tables in keywords.items():
+            if keyword in question_lower:
+                for table in tables:
+                    if table in all_tables and table not in relevant:
+                        relevant.append(table)
+    
+    # Fallback if still no matches
+    return relevant if relevant else all_tables[:5]  # Limit to first 5 to avoid overwhelming
+def create_sql_generation_chain(llm, db):
+    """Create a chain that generates SQL from natural language."""
+    # Create a more explicit prompt template
+    sql_prompt = PromptTemplate(
+        input_variables=["input", "table_info", "dialect", "top_k"],
+        template="""You are an expert SQL query writer. Your task is to convert natural language questions into SQL queries.
+
+Database Schema Information:
+{table_info}
+
+Database dialect: {dialect}
+
+User Question: {input}
+
+Top {top_k} most similar tables:
+{table_info}
+
+Write a SQL query to answer the user's question.
+SQL Query:"""
+    )
+    
+    # Create the chain
+    chain = create_sql_query_chain(
+        llm=llm,
+        db=db,
+        prompt=sql_prompt
+    )
+    
+    return chain
+
+def execute_sql_query(query, db_uri):
+    """Execute a SQL query and return the results."""
+    try:
+        # Create engine
+        engine = create_engine(db_uri)
+        
+        # Execute query
+        with engine.connect() as conn:
+            result = conn.execute(text(query))
+            columns = result.keys()
+            rows = result.fetchall()
+            
+        # Format results
+        formatted_results = []
+        for row in rows:
+            formatted_results.append(dict(zip(columns, row)))
+            
+        return {
+            "success": True,
+            "query": query,
+            "results": formatted_results,
+            "column_names": columns
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "query": query,
+            "error": str(e)
+        }
+
+def format_results(query_results):
+    """Format the results in a readable way."""
+    if not query_results["success"]:
+        return f"❌ Error executing query: {query_results['error']}"
+    
+    if not query_results["results"]:
+        return "📭 No results found for this query."
+    
+    # Format as a table
+    result_str = "\n📊 Query Results:\n"
+    
+    # Get column widths
+    sample_row = query_results["results"][0]
+    col_widths = {col: max(len(str(col)), max(len(str(row[col])) for row in query_results["results"])) 
+                 for col in sample_row.keys()}
+    
+    # Header
+    header = " | ".join(f"{col:{col_widths[col]}}" for col in sample_row.keys())
+    separator = "-" * len(header)
+    
+    result_str += f"{header}\n{separator}\n"
+    
+    # Rows
+    for row in query_results["results"]:
+        result_str += " | ".join(f"{str(val):{col_widths[k]}}" for k, val in row.items()) + "\n"
+    
+    return result_str
+
+def handle_time_expressions(query):
+    """Handle common time expressions in the query."""
+    today = datetime.now()
+    replacements = {
+        "last week": f"BETWEEN '{(today - timedelta(days=7)).strftime('%Y-%m-%d')}' AND '{today.strftime('%Y-%m-%d')}'",
+        "this week": f"BETWEEN '{(today - timedelta(days=today.weekday())).strftime('%Y-%m-%d')}' AND '{today.strftime('%Y-%m-%d')}'",
+        "last month": f"BETWEEN '{(today.replace(day=1) - timedelta(days=1)).replace(day=1).strftime('%Y-%m-%d')}' AND '{(today.replace(day=1) - timedelta(days=1)).strftime('%Y-%m-%d')}'",
+        "this month": f"BETWEEN '{today.replace(day=1).strftime('%Y-%m-%d')}' AND '{today.strftime('%Y-%m-%d')}'",
+        "yesterday": f"= '{(today - timedelta(days=1)).strftime('%Y-%m-%d')}'",
+        "today": f"= '{today.strftime('%Y-%m-%d')}'"
+    }
+    
+    # Find if query contains time expressions
+    for expr, replacement in replacements.items():
+        if expr in query.lower():
+            query = query.replace(expr, f"date_expression_{expr}")
+    
+    return query
+
+def main():
+    # Load the model
+    llm = load_tinyllama_model()
+    
+    # Connect to the database
+    db_uri = get_db_connection()
+    
+    # Create database explorer
+    print("📊 Connecting to database...")
+    db = SQLDatabase.from_uri(db_uri)
+    all_tables = db.get_usable_table_names()
+    print(f"✅ Connected! Available tables: {', '.join(all_tables)}")
+    
+    print("\n🔹 Natural Language to SQL Chatbot\n")
+    print("Type 'exit' or 'quit' to stop.")
+    print("Type 'tables' to see available tables.")
+    print("Type 'schema <table>' to see table structure.\n")
+    
+    while True:
+        # Get user input
+        user_question = input("\nUser Question: ").strip()
+        
+        # Check for exit commands
+        if user_question.lower() in ["exit", "quit"]:
+            print("👋 Goodbye!")
+            break
+            
+        # Check for special commands
+        if user_question.lower() == "tables":
+            print(f"Available tables: {', '.join(all_tables)}")
+            continue
+            
+        if user_question.lower().startswith("schema "):
+            table_name = user_question[7:].strip()
+            if table_name in all_tables:
+                engine = create_engine(db_uri)
+                with engine.connect() as conn:
+                    result = conn.execute(text(f"DESCRIBE {table_name}"))
+                    rows = result.fetchall()
+                print(f"\nSchema for {table_name}:")
+                for row in rows:
+                    print(f"  {row[0]}: {row[1]}")
+            else:
+                print(f"Table '{table_name}' not found.")
+            continue
+            
+        if not user_question:
+            continue
+            
+        try:
+            # Process the time expressions in the question
+            processed_question = handle_time_expressions(user_question)
+            
+            # Select relevant tables
+            relevant_tables = select_relevant_tables(processed_question, all_tables)
+            print(f"🔍 Using tables: {', '.join(relevant_tables)}")
+            
+            # Create a database connection with only relevant tables
+            filtered_db = SQLDatabase.from_uri(db_uri, include_tables=relevant_tables)
+            
+            # Create the SQL generation chain
+            chain = create_sql_generation_chain(llm, filtered_db)
+            
+            # Generate SQL
+            print("⏳ Generating SQL query...")
+            sql_query = chain.invoke({"question": processed_question, "dialect": "mysql"})
+            
+            # Extract just the SQL (model might add extra text)
+            sql_lines = []
+            for line in sql_query.split('\n'):
+                if line.strip() and not line.strip().startswith('--') and not line.lower().startswith('sql'):
+                    sql_lines.append(line)
+            final_sql = '\n'.join(sql_lines).strip()
+            
+            # Print the generated SQL
+            print(f"\n📝 Generated SQL Query:\n{final_sql}\n")
+            
+            # Execute the query
+            print("⏳ Executing query...")
+            results = execute_sql_query(final_sql, db_uri)
+            
+            # Format and display results
+            print(format_results(results))
+            
+        except Exception as e:
+            print(f"\n❌ Error: {str(e)}")
+            import traceback
+            print(traceback.format_exc())
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 !pip install torch transformers bitsandbytes accelerate sqlparse
 
 import torch
