@@ -1,4 +1,91 @@
- Entering new SQL Agent Executor chain...
+def build_agent_chain(sqlcoder_llm):
+    query_chain = create_sql_agent(
+        llm=sqlcoder_llm,
+        db=SQLDatabase.from_uri(DB_URI),
+        agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+        verbose=True
+    )
+
+    # Create a chain that maps input -> question if needed
+    input_mapper = RunnableLambda(lambda x: {"question": x["input"]} if "input" in x and "question" not in x else x)
+    
+    # Add the schema information
+    table_chain = RunnableLambda(custom_schema_chain)
+    
+    # Full chain with proper input handling
+    full_chain = (
+        input_mapper | 
+        RunnablePassthrough.assign(table_names_to_use=table_chain) | 
+        query_chain
+    )
+    
+    return full_chain
+
+
+
+
+def process_question_agentic(question: str) -> dict:
+    try:
+        sqlcoder_llm = SQLCoderLLM()
+        agent_chain = build_agent_chain(sqlcoder_llm)
+        # Pass both input and question to handle either case
+        result = agent_chain.invoke({"input": question, "question": question})
+        return result
+    except Exception as e:
+        return {"sql": None, "results": [], "error": str(e)}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Entering new SQL Agent Executor chain...
 Parsing LLM output produced both a final answer and a parse-able action:: You are an agent designed to interact with a SQL database. Given an input question,
 create a syntactically correct sqlite query to run,
                                                then look at the results of the query
