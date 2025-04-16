@@ -1,3 +1,67 @@
+--------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+<ipython-input-6-dad4c334f4fb> in <cell line: 0>()
+     88 
+     89 # Step 7: Instantiate and train
+---> 90 vn = MyVanna()
+     91 vn.connect_to_sqlite(DB_PATH)
+     92 train_from_db_schema_with_fks(vn)
+
+TypeError: Can't instantiate abstract class MyVanna with abstract methods assistant_message, system_message, user_message
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import json
 import re
 import numpy as np
