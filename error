@@ -1,4 +1,43 @@
 
+
+✅ Trained on 6 tables (FKs included: True)
+WARNING:chromadb.segment.impl.vector.local_persistent_hnsw:Number of requested results 10 is greater than number of elements in index 6, updating n_results = 6
+SQL Prompt: ["You are a SQLite expert. Please help to generate a SQL query to answer the question. Your response should ONLY be based on the given context and follow the response guidelines and format instructions. \n===Tables \nCREATE TABLE orders (\n            order_id INTEGER PRIMARY KEY AUTOINCREMENT,\n            customer_id INTEGER NOT NULL,\n            order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n            status VARCHAR(20) CHECK(status IN ('pending', 'processing', 'shipped', 'delivered', 'cancelled')) DEFAULT 'pending',\n            shipping_address VARCHAR(200),\n            shipping_city VARCHAR(50),\n            shipping_country VARCHAR(50),\n            payment_method VARCHAR(50),\n            total_amount DECIMAL(12, 2) NOT NULL DEFAULT 0,\n            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n            FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n        ,\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n);\n\nCREATE TABLE order_details (\n            detail_id INTEGER PRIMARY KEY AUTOINCREMENT,\n            order_id INTEGER NOT NULL,\n            product_id INTEGER NOT NULL,\n            quantity INTEGER NOT NULL,\n            unit_price DECIMAL(10, 2) NOT NULL,\n            discount DECIMAL(5, 2) DEFAULT 0,\n            subtotal DECIMAL(12, 2),\n            FOREIGN KEY (order_id) REFERENCES orders(order_id),\n            FOREIGN KEY (product_id) REFERENCES products(product_id)\n        ,\n  FOREIGN KEY (product_id) REFERENCES products(product_id),\n  FOREIGN KEY (order_id) REFERENCES orders(order_id)\n);\n\nCREATE TABLE inventory_transactions (\n            transaction_id INTEGER PRIMARY KEY AUTOINCREMENT,\n            product_id INTEGER NOT NULL,\n            transaction_type VARCHAR(20) CHECK(transaction_type IN ('purchase', 'sale', 'adjustment', 'return')) NOT NULL,\n            quantity INTEGER NOT NULL,\n            reference_id INTEGER,\n            transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n            notes TEXT,\n            FOREIGN KEY (product_id) REFERENCES products(product_id)\n        ,\n  FOREIGN KEY (product_id) REFERENCES products(product_id)\n);\n\nCREATE TABLE products (\n            product_id INTEGER PRIMARY KEY AUTOINCREMENT,\n            product_name VARCHAR(100) NOT NULL,\n            description TEXT,\n            unit_price DECIMAL(10, 2) NOT NULL,\n            stock_quantity INTEGER NOT NULL DEFAULT 0,\n            category VARCHAR(50),\n            supplier_id INTEGER,\n            is_active BOOLEAN DEFAULT TRUE,\n            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n        )\n\nCREATE TABLE customers (\n            customer_id INTEGER PRIMARY KEY AUTOINCREMENT,\n            company_name VARCHAR(100) NOT NULL,\n            contact_name VARCHAR(100) NOT NULL,\n            email VARCHAR(100) UNIQUE NOT NULL,\n            phone VARCHAR(20),\n            address VARCHAR(200),\n            city VARCHAR(50),\n            country VARCHAR(50),\n            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n        )\n\nCREATE TABLE sqlite_sequence(name,seq)\n\n===Response Guidelines \n1. If the provided context is sufficient, please generate a valid SQL query without any explanations for the question. \n2. If the provided context is almost sufficient but requires knowledge of a specific string in a particular column, please generate an intermediate SQL query to find the distinct strings in that column. Prepend the query with a comment saying intermediate_sql \n3. If the provided context is insufficient, please explain why it can't be generated. \n4. Please use the most relevant table(s). \n5. If the question has been asked and answered before, please repeat the answer exactly as it was given before. \n6. Ensure that the output SQL is SQLite-compliant and executable, and free of syntax errors. \n", 'How many completed orders are there?']
+Unable to create tensor, you should probably activate truncation and/or padding with 'padding=True' 'truncation=True' to have batched tensors with the same length. Perhaps your features (`input_ids` in this case) have excessive nesting (inputs type `list` where type `int` is expected).
+
+📊 Generated SQL & Answer:
+(None, None, None)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 TypeError                                 Traceback (most recent call last)
 <ipython-input-7-d75c5819057f> in <cell line: 0>()
      97 vn = MyVanna()
