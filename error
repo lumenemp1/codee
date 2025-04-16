@@ -1,4 +1,36 @@
 
+ [DEBUG] submit_prompt() CALLED
+Asking to pad but the tokenizer does not have a padding token. Please select a token to use as `pad_token` `(tokenizer.pad_token = tokenizer.eos_token e.g.)` or add a new pad token via `tokenizer.add_special_tokens({'pad_token': '[PAD]'})`.
+
+📊 Generated SQL & Answer:
+(None, None, None)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ✅ Trained on 6 tables (FKs included: True)
 WARNING:chromadb.segment.impl.vector.local_persistent_hnsw:Number of requested results 10 is greater than number of elements in index 6, updating n_results = 6
