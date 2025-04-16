@@ -1,3 +1,43 @@
+
+TypeError                                 Traceback (most recent call last)
+<ipython-input-7-d75c5819057f> in <cell line: 0>()
+     97 vn = MyVanna()
+     98 vn.connect_to_sqlite(DB_PATH)
+---> 99 train_from_db_schema_with_fks(vn)
+    100 
+    101 # Step 7: Ask a natural language question
+
+<ipython-input-7-d75c5819057f> in train_from_db_schema_with_fks(vn, include_fk, table_types)
+     66     placeholders = ','.join(['?'] * len(table_types))
+     67     ddl_query = f"SELECT name, sql FROM sqlite_master WHERE sql IS NOT NULL AND type IN ({placeholders})"
+---> 68     df_ddl = vn.run_sql(ddl_query, params=table_types)
+     69 
+     70     trained = 0
+
+TypeError: VannaBase.connect_to_sqlite.<locals>.run_sql_sqlite() got an unexpected keyword argument 'params'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 --------------------------------------------------------------------------
 TypeError                                 Traceback (most recent call last)
 <ipython-input-6-dad4c334f4fb> in <cell line: 0>()
