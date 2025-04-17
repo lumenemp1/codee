@@ -1,4 +1,64 @@
 
+
+Using fallback chat format: llama-2
+Traceback (most recent call last):
+  File "C:\Users\AD54619\Text2Sql\sqlcoder\agent.py", line 70, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\AD54619\Text2Sql\sqlcoder\agent.py", line 48, in main
+    llm = SQLCoderLLM(raw_model)
+  File "C:\Users\AD54619\Text2Sql\sqlcoder\agent.py", line 34, in __init__
+    self.model = model
+    ^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\pydantic\main.py", line 990, in __setattr__
+    elif (setattr_handler := self._setattr_handler(name, value)) is not None:
+                             ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\pydantic\main.py", line 1037, in _setattr_handler
+    raise ValueError(f'"{cls.__name__}" object has no field "{name}"')
+ValueError: "SQLCoderLLM" object has no field "model"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  [DEBUG] submit_prompt() CALLED
 Asking to pad but the tokenizer does not have a padding token. Please select a token to use as `pad_token` `(tokenizer.pad_token = tokenizer.eos_token e.g.)` or add a new pad token via `tokenizer.add_special_tokens({'pad_token': '[PAD]'})`.
 
