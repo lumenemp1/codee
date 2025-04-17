@@ -1,5 +1,55 @@
 
 
+
+> Entering new SQL Agent Executor chain...
+llama_perf_context_print:        load time =   46833.04 ms
+llama_perf_context_print: prompt eval time =   46830.84 ms /   630 tokens (   74.33 ms per token,    13.45 tokens per second)
+llama_perf_context_print:        eval time =    2763.67 ms /    16 runs   (  172.73 ms per token,     5.79 tokens per second)
+llama_perf_context_print:       total time =   49605.95 ms /   646 tokens
+Action: sql_db_list_tables
+Action Input:Llama.generate: 646 prefix-match hit, remaining 22 prompt tokens to eval
+llama_perf_context_print:        load time =   46833.04 ms
+llama_perf_context_print: prompt eval time =    1923.09 ms /    22 tokens (   87.41 ms per token,    11.44 tokens per second)
+llama_perf_context_print:        eval time =    6365.65 ms /    38 runs   (  167.52 ms per token,     5.97 tokens per second)
+llama_perf_context_print:       total time =    8308.57 ms /    60 tokens
+customers, inventory_transactions, order_details, orders, products Now that I know the tables I can query I should query the schema of the most relevant tables.
+Action: sql_db_schema
+Action Input: customers, ordersCREATE TABLE customers ...
+-- Unable to fetch DDL for table customers
+
+CREATE TABLE orders ...
+-- Unable to fetch DDL for table ordersLlama.generate: 706 prefix-match hit, remaining 37 prompt tokens to eval
+llama_perf_context_print:        load time =   46833.04 ms
+llama_perf_context_print: prompt eval time =    3144.81 ms /    37 tokens (   84.99 ms per token,    11.77 tokens per second)
+llama_perf_context_print:        eval time =    6296.12 ms /    37 runs   (  170.17 ms per token,     5.88 tokens per second)
+llama_perf_context_print:       total time =    9458.41 ms /    74 tokens
+ Now that I know the relevant tables I can query I can query them.
+Action: sql_db_query
+Action Input: SELECT * FROM customers; SELECT * FROM orders;Error: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'SELECT * FROM orders' at line 1")
+[SQL: SELECT * FROM customers; SELECT * FROM orders;]
+(Background on this error at: https://sqlalche.me/e/20/f405)Llama.generate: 780 prefix-match hit, remaining 109 prompt tokens to eval 
+llama_perf_context_print:        load time =   46833.04 ms
+llama_perf_context_print: prompt eval time =    8945.39 ms /   109 tokens (   82.07 ms per token,    12.19 tokens per second)
+llama_perf_context_print:        eval time =    7449.92 ms /    40 runs   (  186.25 ms per token,     5.37 tokens per second)
+llama_perf_context_print:       total time =   16413.92 ms /   149 tokens
+ I must have made a mistake in my query, I will try again.
+Action: sql_db_query_checker
+Action Input: SELECT * FROM customers; SELECT * FROM orders;Llama.generate: 1 prefix-match hit, remaining 141 prompt tokens to eval 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 > Entering new SQL Agent Executor chain...
 llama_perf_context_print:        load time =   55018.20 ms
 llama_perf_context_print: prompt eval time =   55015.83 ms /   633 tokens (   86.91 ms per token,    11.51 tokens per second)
