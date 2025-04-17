@@ -1,5 +1,397 @@
 
 
+> Entering new SQL Agent Executor chain...
+llama_perf_context_print:        load time =   55018.20 ms
+llama_perf_context_print: prompt eval time =   55015.83 ms /   633 tokens (   86.91 ms per token,    11.51 tokens per second)
+llama_perf_context_print:        eval time =    3072.75 ms /    16 runs   (  192.05 ms per token,     5.21 tokens per second)
+llama_perf_context_print:       total time =   58108.59 ms /   649 tokens
+Action: sql_db_list_tables
+Action Input:Llama.generate: 649 prefix-match hit, remaining 22 prompt tokens to eval
+llama_perf_context_print:        load time =   55018.20 ms
+llama_perf_context_print: prompt eval time =    1803.21 ms /    22 tokens (   81.96 ms per token,    12.20 tokens per second)
+llama_perf_context_print:        eval time =    9580.93 ms /    45 runs   (  212.91 ms per token,     4.70 tokens per second)
+llama_perf_context_print:       total time =   11409.41 ms /    67 tokens
+customers, inventory_transactions, order_details, orders, products I can now query the schema of those tables and find the relevant columns.
+Action: sql_db_schema
+Action Input: customers, inventory_transactions, order_details, orders, products
+CREATE TABLE customers (
+        customer_id INTEGER NOT NULL AUTO_INCREMENT, 
+        company_name VARCHAR(100) NOT NULL, 
+        contact_name VARCHAR(100) NOT NULL, 
+        email VARCHAR(100) NOT NULL, 
+        phone VARCHAR(20), 
+        address VARCHAR(200), 
+        city VARCHAR(50), 
+        country VARCHAR(50), 
+        created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP, 
+        updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, 
+        PRIMARY KEY (customer_id)
+)COLLATE utf8mb4_0900_ai_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from customers table:
+customer_id     company_name    contact_name    email   phone   address city    country created_at      updated_at
+1       Acme Corporation        John Smith      john.smith@acme.com     555-123-4567    123 Business Ave        New York        USA  2025-04-04 17:28:56      2025-04-04 17:28:56
+2       Global Enterprises      Sarah Johnson   sarah.j@globalent.com   555-987-6543    456 Commerce St London  UK      2025-04-04 17:28:56   2025-04-04 17:28:56
+3       Tech Solutions Inc      Michael Wong    mwong@techsol.com       555-555-1234    789 Innovation Dr       San Francisco   USA  2025-04-04 17:28:56      2025-04-04 17:28:56
+*/
+
+
+CREATE TABLE inventory_transactions (
+        transaction_id INTEGER NOT NULL AUTO_INCREMENT, 
+        product_id INTEGER NOT NULL, 
+        transaction_type ENUM('purchase','sale','adjustment','return') NOT NULL, 
+        quantity INTEGER NOT NULL, 
+        reference_id INTEGER COMMENT 'Order ID or other reference', 
+        transaction_date TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP, 
+        notes TEXT, 
+        PRIMARY KEY (transaction_id), 
+        CONSTRAINT inventory_transactions_ibfk_1 FOREIGN KEY(product_id) REFERENCES products (product_id)
+)COLLATE utf8mb4_0900_ai_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from inventory_transactions table:
+transaction_id  product_id      transaction_type        quantity        reference_id    transaction_date        notes
+1       1       sale    -1      1       2025-04-04 17:28:56     Order #1
+2       4       sale    -2      1       2025-04-04 17:28:56     Order #1
+3       5       sale    -5      1       2025-04-04 17:28:56     Order #1
+*/
+
+
+CREATE TABLE order_details (
+        detail_id INTEGER NOT NULL AUTO_INCREMENT, 
+        order_id INTEGER NOT NULL, 
+        product_id INTEGER NOT NULL, 
+        quantity INTEGER NOT NULL, 
+        unit_price DECIMAL(10, 2) NOT NULL, 
+        discount DECIMAL(5, 2) DEFAULT '0.00', 
+        subtotal DECIMAL(12, 2) GENERATED ALWAYS AS ((((`quantity` * `unit_price`) * (1 - `discount`)))) STORED, 
+        PRIMARY KEY (detail_id), 
+        CONSTRAINT order_details_ibfk_1 FOREIGN KEY(order_id) REFERENCES orders (order_id), 
+        CONSTRAINT order_details_ibfk_2 FOREIGN KEY(product_id) REFERENCES products (product_id)
+)COLLATE utf8mb4_0900_ai_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from order_details table:
+detail_id       order_id        product_id      quantity        unit_price      discount        subtotal
+1       1       1       1       2499.99 0.00    2499.99
+2       1       4       2       349.99  0.00    699.98
+3       1       5       5       79.99   0.05    379.95
+*/
+
+
+CREATE TABLE orders (
+        order_id INTEGER NOT NULL AUTO_INCREMENT, 
+        customer_id INTEGER NOT NULL, 
+        order_date TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP, 
+        status ENUM('pending','processing','shipped','delivered','cancelled') DEFAULT 'pending', 
+        shipping_address VARCHAR(200), 
+        shipping_city VARCHAR(50), 
+        shipping_country VARCHAR(50), 
+        payment_method VARCHAR(50), 
+        total_amount DECIMAL(12, 2) NOT NULL DEFAULT '0.00', 
+        created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP, 
+        updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, 
+        PRIMARY KEY (order_id), 
+        CONSTRAINT orders_ibfk_1 FOREIGN KEY(customer_id) REFERENCES customers (customer_id)
+)COLLATE utf8mb4_0900_ai_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from orders table:
+order_id        customer_id     order_date      status  shipping_address        shipping_city   shipping_country        payment_methototal_amount     created_at      updated_at
+1       1       2025-03-15 10:30:00     delivered       123 Business Ave        New York        USA     Credit Card     3799.97 2025-04-04 17:28:56   2025-04-04 17:28:56
+2       2       2025-03-20 14:15:00     shipped 456 Commerce St London  UK      Bank Transfer   2199.48 2025-04-04 17:28:56     2025-04-04 17:28:56
+3       3       2025-03-25 09:45:00     processing      789 Innovation Dr       San Francisco   USA     Credit Card     4099.95 2025-04-04 17:28:56   2025-04-04 17:28:56
+*/
+
+
+CREATE TABLE products (
+        product_id INTEGER NOT NULL AUTO_INCREMENT, 
+        product_name VARCHAR(100) NOT NULL, 
+        description TEXT, 
+        unit_price DECIMAL(10, 2) NOT NULL, 
+        stock_quantity INTEGER NOT NULL DEFAULT '0', 
+        category VARCHAR(50), 
+        supplier_id INTEGER, 
+        is_active TINYINT(1) DEFAULT '1', 
+        created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP, 
+        updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, 
+        PRIMARY KEY (product_id)
+)COLLATE utf8mb4_0900_ai_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from products table:
+product_id      product_name    description     unit_price      stock_quantity  category        supplier_id     is_active       created_at    updated_at
+1       Enterprise Server X1    High-performance server for medium businesses   2499.99 15      Hardware        1       1       2025-04-04 17:28:56   2025-04-04 17:28:56
+2       Cloud Storage Solution  Managed cloud storage service - annual license  899.50  100     Software        2       1       2025-04-04 17:28:56   2025-04-04 17:28:56
+3       Network Security Suite  Complete security package with firewall and intrusion detection 1299.99 30      Software        2    2025-04-04 17:28:56      2025-04-04 17:28:56
+*/Traceback (most recent call last):
+  File "C:\Users\AD54619\Text2Sql\sqlcoder\agent.py", line 75, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\AD54619\Text2Sql\sqlcoder\agent.py", line 69, in main
+    result = agent_executor.invoke({"input": question})
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain\chains\base.py", line 170, in invoke
+    raise e
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain\chains\base.py", line 160, in invoke
+    self._call(inputs, run_manager=run_manager)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain\agents\agent.py", line 1624, in _call
+    next_step_output = self._take_next_step(
+        name_to_tool_map,
+    ...<3 lines>...
+        run_manager=run_manager,
+    )
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain\agents\agent.py", line 1332, in _take_next_step
+    for a in self._iter_next_step(
+             ~~~~~~~~~~~~~~~~~~~~^
+        name_to_tool_map,
+        ^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        run_manager,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain\agents\agent.py", line 1358, in _iter_next_step
+    output = self._action_agent.plan(
+        intermediate_steps,
+        callbacks=run_manager.get_child() if run_manager else None,
+        **inputs,
+    )
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain\agents\agent.py", line 465, in plan
+    for chunk in self.runnable.stream(inputs, config={"callbacks": callbacks}):
+                 ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\runnables\base.py", line 3409, in stream
+    yield from self.transform(iter([input]), config, **kwargs)
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\runnables\base.py", line 3396, in transform
+    yield from self._transform_stream_with_config(
+    ...<4 lines>...
+    )
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\runnables\base.py", line 2199, in _transform_stream_with_config
+    chunk: Output = context.run(next, iterator)  # type: ignore
+                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\runnables\base.py", line 3359, in _transform
+    yield from final_pipeline
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\runnables\base.py", line 1413, in transform
+    for ichunk in input:
+                  ^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\runnables\base.py", line 5565, in transform
+    yield from self.bound.transform(
+    ...<3 lines>...
+    )
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\runnables\base.py", line 1431, in transform
+    yield from self.stream(final, config, **kwargs)
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\language_models\llms.py", line 528, in stream
+    yield self.invoke(input, config=config, stop=stop, **kwargs)
+          ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\language_models\llms.py", line 390, in invoke
+    self.generate_prompt(
+    ~~~~~~~~~~~~~~~~~~~~^
+        [self._convert_input(input)],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\language_models\llms.py", line 763, in generate_prompt
+    return self.generate(prompt_strings, stop=stop, callbacks=callbacks, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\language_models\llms.py", line 966, in generate
+    output = self._generate_helper(
+        prompts, stop, run_managers, bool(new_arg_supported), **kwargs
+    )
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\language_models\llms.py", line 787, in _generate_helper  
+    self._generate(
+    ~~~~~~~~~~~~~~^
+        prompts,
+        ^^^^^^^^
+    ...<3 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\language_models\llms.py", line 1528, in _generate        
+    else self._call(prompt, stop=stop, **kwargs)
+         ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\sqlcoder\agent.py", line 45, in _call
+    output = self._model(prompt, max_tokens=512, stop=stop)
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\llama_cpp\llama.py", line 1902, in __call__
+    return self.create_completion(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        prompt=prompt,
+        ^^^^^^^^^^^^^^
+    ...<23 lines>...
+        logit_bias=logit_bias,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\llama_cpp\llama.py", line 1835, in create_completion
+    completion: Completion = next(completion_or_chunks)  # type: ignore
+                             ~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\llama_cpp\llama.py", line 1271, in _create_completion
+    raise ValueError(
+        f"Requested tokens ({len(prompt_tokens)}) exceed context window of {llama_cpp.llama_n_ctx(self.ctx)}"
+    )
+ValueError: Requested tokens (3057) exceed context window of 2048
+PS C:\Users\AD54619\Text2Sql\sqlcoder> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Using fallback chat format: llama-2
 Traceback (most recent call last):
   File "C:\Users\AD54619\Text2Sql\sqlcoder\agent.py", line 70, in <module>
