@@ -1,5 +1,282 @@
 
 
+> Entering new SQL Agent Executor chain...
+llama_perf_context_print:        load time =   47066.53 ms
+llama_perf_context_print: prompt eval time =   47061.96 ms /   634 tokens (   74.23 ms per token,    13.47 tokens per second)
+llama_perf_context_print:        eval time =    3254.69 ms /    16 runs   (  203.42 ms per token,     4.92 tokens per second)
+llama_perf_context_print:       total time =   50333.04 ms /   650 tokens
+Action: sql_db_list_tables
+Action Input:Llama.generate: 650 prefix-match hit, remaining 22 prompt tokens to eval
+llama_perf_context_print:        load time =   47066.53 ms
+llama_perf_context_print: prompt eval time =    1982.87 ms /    22 tokens (   90.13 ms per token,    11.10 tokens per second)
+llama_perf_context_print:        eval time =    7195.44 ms /    43 runs   (  167.34 ms per token,     5.98 tokens per second)
+llama_perf_context_print:       total time =    9201.12 ms /    65 tokens
+customers, inventory_transactions, order_details, orders, productsNow that I know the relevant tables I can look at their schema to see what columns I can query.
+Action: sql_db_schema
+Action Input: orders, order_details, productsCREATE TABLE orders ...
+
+  order_id INTEGER
+  customer_id INTEGER
+  order_date TIMESTAMP
+  status ENUM
+  shipping_address VARCHAR(200)
+  shipping_city VARCHAR(50)
+  shipping_country VARCHAR(50)
+  payment_method VARCHAR(50)
+  total_amount DECIMAL(12, 2)
+  created_at TIMESTAMP
+  updated_at TIMESTAMP
+
+CREATE TABLE order_details ...
+
+  detail_id INTEGER
+  order_id INTEGER
+  product_id INTEGER
+  quantity INTEGER
+  unit_price DECIMAL(10, 2)
+  discount DECIMAL(5, 2)
+  subtotal DECIMAL(12, 2)
+
+CREATE TABLE products ...
+
+  product_id INTEGER
+  product_name VARCHAR(100)
+  description TEXT
+  unit_price DECIMAL(10, 2)
+  stock_quantity INTEGER
+  category VARCHAR(50)
+  supplier_id INTEGER
+  is_active TINYINT
+  created_at TIMESTAMP
+  updated_at TIMESTAMPLlama.generate: 671 prefix-match hit, remaining 346 prompt tokens to eval
+llama_perf_context_print:        load time =   47066.53 ms
+llama_perf_context_print: prompt eval time =   29452.59 ms /   346 tokens (   85.12 ms per token,    11.75 tokens per second)
+llama_perf_context_print:        eval time =    6715.70 ms /    40 runs   (  167.89 ms per token,     5.96 tokens per second)
+llama_perf_context_print:       total time =   36188.78 ms /   386 tokens
+Now that I have the relevant information, I can write a query that returns all records from the orders table.
+Action: sql_db_query
+Action Input: SELECT * FROM orders o;[(1, 1, datetime.datetime(2025, 3, 15, 10, 30), 'delivered', '123 Business Ave', 'New York', 'USA', 'Credit Card', Decimal('3799.97'), datetime.datetime(2025, 4, 4, 17, 28, 56), datetime.datetime(2025, 4, 4, 17, 28, 56)), (2, 2, datetime.datetime(2025, 3, 20, 14, 15), 'shipped', '456 Commerce St', 'London', 'UK', 'Bank Transfer', Decimal('2199.48'), datetime.datetime(2025, 4, 4, 17, 28, 56), datetime.datetime(2025, 4, 4, 17, 28, 56)), (3, 3, datetime.datetime(2025, 3, 25, 9, 45), 'processing', '789 Innovation Dr', 'San Francisco', 'USA', 'Credit Card', Decimal('4099.95'), datetime.datetime(2025, 4, 4, 17, 28, 56), datetime.datetime(2025, 4, 4, 17, 28, 56)), (4, 4, datetime.datetime(2025, 3, 28, 16, 20), 'pending', '10 Trade Blvd', 'Berlin', 'Germany', 'PayPal', Decimal('599.99'), datetime.datetime(2025, 4, 4, 17, 28, 56), datetime.datetime(2025, 4, 4, 17, 28, 56)), (5, 5, datetime.datetime(2025, 4, 1, 11, 10), 'processing', '55 Harbor Way', 'Sydney', 'Australia', 'Credit Card', Decimal('1529.96'), datetime.datetime(2025, 4, 4, 17, 28, 56), datetime.datetime(2025, 4, 4, 17, 28, 56)), (6, 6, datetime.datetime(2025, 4, 2, 8, 45), 'pending', '789 Industrial Park', 'Chicago', 'USA', 'Credit Card', Decimal('2399.97'), datetime.datetime(2025, 4, 4, 22, 34, 28), datetime.datetime(2025, 4, 4, 22, 34, 28)), (7, 7, datetime.datetime(2025, 4, 3, 10, 20), 'processing', '45 Winter Road', 'Stockholm', 'Sweden', 'Bank Transfer', Decimal('3449.95'), datetime.datetime(2025, 4, 4, 22, 34, 28), datetime.datetime(2025, 4, 4, 22, 34, 28)), (8, 8, datetime.datetime(2025, 4, 4, 13, 15), 'pending', '123 Palm Avenue', 'Miami', 'USA', 'PayPal', Decimal('859.96'), datetime.datetime(2025, 4, 4, 22, 34, 28), datetime.datetime(2025, 4, 4, 22, 34, 28)), (9, 9, datetime.datetime(2025, 4, 5, 9, 30), 'processing', '67 Tech Lane', 'Manchester', 'UK', 'Credit Card', Decimal('4499.95'), datetime.datetime(2025, 4, 4, 22, 34, 28), datetime.datetime(2025, 4, 4, 22, 34, 28)), (10, 10, datetime.datetime(2025, 4, 6, 14, 10), 'pending', '90 Commerce Drive', 'Singapore', 'Singapore', 'Bank Transfer', Decimal('1949.95'), datetime.datetime(2025, 4, 4, 22, 34, 28), datetime.datetime(2025, 4, 4, 22, 34, 28))]Traceback (most recent call last):
+  File "C:\Users\AD54619\Text2Sql\sqlcoder\agent.py", line 116, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\AD54619\Text2Sql\sqlcoder\agent.py", line 110, in main
+    result = agent_executor.invoke({"input": question})
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain\chains\base.py", line 170, in invoke
+    raise e
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain\chains\base.py", line 160, in invoke
+    self._call(inputs, run_manager=run_manager)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain\agents\agent.py", line 1624, in _call
+    next_step_output = self._take_next_step(
+        name_to_tool_map,
+    ...<3 lines>...
+        run_manager=run_manager,
+    )
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain\agents\agent.py", line 1332, in _take_next_step
+    for a in self._iter_next_step(
+             ~~~~~~~~~~~~~~~~~~~~^
+        name_to_tool_map,
+        ^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        run_manager,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain\agents\agent.py", line 1358, in _iter_next_step
+    output = self._action_agent.plan(
+        intermediate_steps,
+        callbacks=run_manager.get_child() if run_manager else None,
+        **inputs,
+    )
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain\agents\agent.py", line 465, in plan
+    for chunk in self.runnable.stream(inputs, config={"callbacks": callbacks}):
+                 ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\runnables\base.py", line 3409, in stream
+    yield from self.transform(iter([input]), config, **kwargs)
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\runnables\base.py", line 3396, in transform
+    yield from self._transform_stream_with_config(
+    ...<4 lines>...
+    )
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\runnables\base.py", line 2199, in _transform_stream_with_config
+    chunk: Output = context.run(next, iterator)  # type: ignore
+                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\runnables\base.py", line 3359, in _transform
+    yield from final_pipeline
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\runnables\base.py", line 1413, in transform
+    for ichunk in input:
+                  ^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\runnables\base.py", line 5565, in transform
+    yield from self.bound.transform(
+    ...<3 lines>...
+    )
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\runnables\base.py", line 1431, in transform
+    yield from self.stream(final, config, **kwargs)
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\language_models\llms.py", line 528, in stream
+    yield self.invoke(input, config=config, stop=stop, **kwargs)
+          ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\language_models\llms.py", line 390, in invoke
+    self.generate_prompt(
+    ~~~~~~~~~~~~~~~~~~~~^
+        [self._convert_input(input)],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\language_models\llms.py", line 763, in generate_prompt   
+    return self.generate(prompt_strings, stop=stop, callbacks=callbacks, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\language_models\llms.py", line 966, in generate
+    output = self._generate_helper(
+        prompts, stop, run_managers, bool(new_arg_supported), **kwargs
+    )
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\language_models\llms.py", line 787, in _generate_helper  
+    self._generate(
+    ~~~~~~~~~~~~~~^
+        prompts,
+        ^^^^^^^^
+    ...<3 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\langchain_core\language_models\llms.py", line 1528, in _generate        
+    else self._call(prompt, stop=stop, **kwargs)
+         ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\sqlcoder\agent.py", line 45, in _call
+    output = self._model(prompt, max_tokens=512, stop=stop)
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\llama_cpp\llama.py", line 1902, in __call__
+    return self.create_completion(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        prompt=prompt,
+        ^^^^^^^^^^^^^^
+    ...<23 lines>...
+        logit_bias=logit_bias,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\llama_cpp\llama.py", line 1835, in create_completion
+    completion: Completion = next(completion_or_chunks)  # type: ignore
+                             ~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\llama_cpp\llama.py", line 1271, in _create_completion
+    raise ValueError(
+        f"Requested tokens ({len(prompt_tokens)}) exceed context window of {llama_cpp.llama_n_ctx(self.ctx)}"
+    )
+ValueError: Requested tokens (2246) exceed context window of 2048
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 > Entering new SQL Agent Executor chain...
 llama_perf_context_print:        load time =   46833.04 ms
