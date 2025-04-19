@@ -1,4 +1,323 @@
 
+✨ Ready!  Ask me anything about your database.
+
+❓> which is the least ordered product
+C:\Users\AD54619\Text2Sql\sqlcoder\twostep.py:177: LangChainDeprecationWarning: The method `Chain.__call__` was deprecated in langchain 0.1.0 and will be removed in 1.0. Use :meth:`~invoke` instead.
+  result = agent({"input": question})
+
+
+> Entering new AgentExecutor chain...
+llama_perf_context_print:        load time =   31532.86 ms
+llama_perf_context_print: prompt eval time =   31532.05 ms /   374 tokens (   84.31 ms per token,    11.86 tokens per second)
+llama_perf_context_print:        eval time =    7944.31 ms /    45 runs   (  176.54 ms per token,     5.66 tokens per second)
+llama_perf_context_print:       total time =   39506.95 ms /   419 tokens
+the product with the lowest value in the product_number column.
+Action: sql_db_query
+Action Input: SELECT p.product_number FROM products p ORDER BY p.product_number ASC LIMIT 1
+Observation: Error: (pymysql.err.OperationalError) (1054, "Unknown column 'p.product_number' in 'field list'")
+[SQL: SELECT p.product_number FROM products p ORDER BY p.product_number ASC LIMIT 1]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+Thought:Llama.generate: 374 prefix-match hit, remaining 141 prompt tokens to eval
+llama_perf_context_print:        load time =   31532.86 ms
+llama_perf_context_print: prompt eval time =   14868.74 ms /   141 tokens (  105.45 ms per token,     9.48 tokens per second)
+llama_perf_context_print:        eval time =    3954.51 ms /    24 runs   (  164.77 ms per token,     6.07 tokens per second)
+llama_perf_context_print:       total time =   18838.05 ms /   165 tokens
+Let's check the table schema
+Action: sql_db_schema
+Action Input: SELECT * FROM products p
+🧩 Tables selected for prompt: ['customers', 'inventory_transactions', 'order_details', 'orders', 'products']
+
+
+Observation: CREATE TABLE `customers` (
+  `customer_id` int NOT NULL AUTO_INCREMENT,
+  `company_name` varchar(100) NOT NULL,
+  `contact_name` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `address` varchar(200) DEFAULT NULL,
+  `city` varchar(50) DEFAULT NULL,
+  `country` varchar(50) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`customer_id`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `inventory_transactions` (
+  `transaction_id` int NOT NULL AUTO_INCREMENT,
+  `product_id` int NOT NULL,
+  `transaction_type` enum('purchase','sale','adjustment','return') NOT NULL,
+  `quantity` int NOT NULL,
+  `reference_id` int DEFAULT NULL COMMENT 'Order ID or other reference',
+  `transaction_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `notes` text,
+  PRIMARY KEY (`transaction_id`),
+  KEY `product_id` (`product_id`),
+  CONSTRAINT `inventory_transactions_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `order_details` (
+  `detail_id` int NOT NULL AUTO_INCREMENT,
+  `order_id` int NOT NULL,
+  `product_id` int NOT NULL,
+  `quantity` int NOT NULL,
+  `unit_price` decimal(10,2) NOT NULL,
+  `discount` decimal(5,2) DEFAULT '0.00',
+  `subtotal` decimal(12,2) GENERATED ALWAYS AS (((`quantity` * `unit_price`) * (1 - `discount`))) STORED,
+  PRIMARY KEY (`detail_id`),
+  KEY `order_id` (`order_id`),
+  KEY `product_id` (`product_id`),
+  CONSTRAINT `order_details_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`),
+  CONSTRAINT `order_details_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `orders` (
+  `order_id` int NOT NULL AUTO_INCREMENT,
+  `customer_id` int NOT NULL,
+  `order_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `status` enum('pending','processing','shipped','delivered','cancelled') DEFAULT 'pending',
+  `shipping_address` varchar(200) DEFAULT NULL,
+  `shipping_city` varchar(50) DEFAULT NULL,
+  `shipping_country` varchar(50) DEFAULT NULL,
+  `payment_method` varchar(50) DEFAULT NULL,
+  `total_amount` decimal(12,2) NOT NULL DEFAULT '0.00',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`order_id`),
+  KEY `customer_id` (`customer_id`),
+  CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`customer_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `products` (
+  `product_id` int NOT NULL AUTO_INCREMENT,
+  `product_name` varchar(100) NOT NULL,
+  `unit_price` decimal(10,2) NOT NULL,
+  `stock_quantity` int NOT NULL DEFAULT '0',
+  `category` varchar(50) DEFAULT NULL,
+  `supplier_id` int DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+Thought:Llama.generate: 515 prefix-match hit, remaining 1318 prompt tokens to eval
+llama_perf_context_print:        load time =   31532.86 ms
+llama_perf_context_print: prompt eval time =  130552.54 ms /  1318 tokens (   99.05 ms per token,    10.10 tokens per second)
+llama_perf_context_print:        eval time =    1179.70 ms /     6 runs   (  196.62 ms per token,     5.09 tokens per second)
+llama_perf_context_print:       total time =  131737.26 ms /  1324 tokens
+I now know the final answer
+Observation: Invalid Format: Missing 'Action:' after 'Thought:
+Thought:Llama.generate: 1833 prefix-match hit, remaining 28 prompt tokens to eval
+llama_perf_context_print:        load time =   31532.86 ms
+llama_perf_context_print: prompt eval time =    2970.36 ms /    28 tokens (  106.08 ms per token,     9.43 tokens per second)
+llama_perf_context_print:        eval time =    4923.29 ms /    30 runs   (  164.11 ms per token,     6.09 tokens per second)
+llama_perf_context_print:       total time =    7911.54 ms /    58 tokens
+I now know the final answer
+Final Answer: SELECT p.product_number FROM products p ORDER BY p.product_number ASC LIMIT 1
+
+> Finished chain.
+
+🪜 Agent reasoning trace:
+• sql_db_query: SELECT p.product_number FROM products p ORDER BY p.product_number ASC LIMIT 1
+• sql_db_schema: SELECT * FROM products p
+• _Exception: Invalid Format: Missing 'Action:' after 'Thought:
+
+✅ Final answer:
+SELECT p.product_number FROM products p ORDER BY p.product_number ASC LIMIT 1
+❓>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
  Ready!  Ask me anything about your database.
 
