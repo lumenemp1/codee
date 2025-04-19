@@ -1,4 +1,325 @@
+
+
  Ready!  Ask me anything about your database.
+
+❓> give me details about wireless keyboard
+
+
+> Entering new SQL Agent Executor chain...
+llama_perf_context_print:        load time =   53046.07 ms
+llama_perf_context_print: prompt eval time =   53044.85 ms /   633 tokens (   83.80 ms per token,    11.93 tokens per second)
+llama_perf_context_print:        eval time =    2383.05 ms /    16 runs   (  148.94 ms per token,     6.71 tokens per second)
+llama_perf_context_print:       total time =   55439.25 ms /   649 tokens
+Action: sql_db_list_tables
+Action Input:Llama.generate: 649 prefix-match hit, remaining 22 prompt tokens to eval
+llama_perf_context_print:        load time =   53046.07 ms
+llama_perf_context_print: prompt eval time =    2164.15 ms /    22 tokens (   98.37 ms per token,    10.17 tokens per second)
+llama_perf_context_print:        eval time =    4148.43 ms /    27 runs   (  153.65 ms per token,     6.51 tokens per second)
+llama_perf_context_print:       total time =    6328.44 ms /    49 tokens
+customers, inventory_transactions, order_details, orders, productsI can query the schema of the orders table now.
+Action: sql_db_schema
+Action Input: ordersCREATE TABLE orders …
+  order_id INTEGER
+  customer_id INTEGER
+  order_date TIMESTAMP
+  status ENUM
+  shipping_address VARCHAR(200)
+  shipping_city VARCHAR(50)
+  shipping_country VARCHAR(50)
+  payment_method VARCHAR(50)
+  total_amount DECIMAL(12, 2)
+  created_at TIMESTAMP
+  updated_at TIMESTAMPLlama.generate: 670 prefix-match hit, remaining 146 prompt tokens to eval
+llama_perf_context_print:        load time =   53046.07 ms
+llama_perf_context_print: prompt eval time =   14150.11 ms /   146 tokens (   96.92 ms per token,    10.32 tokens per second)
+llama_perf_context_print:        eval time =    4168.80 ms /    27 runs   (  154.40 ms per token,     6.48 tokens per second)
+llama_perf_context_print:       total time =   18335.06 ms /   173 tokens
+I should query the schema of the products table now.
+Action: sql_db_schema
+Action Input: productsCREATE TABLE products …
+  product_id INTEGER
+  product_name VARCHAR(100)
+  description TEXT
+  unit_price DECIMAL(10, 2)
+  stock_quantity INTEGER
+  category VARCHAR(50)
+  supplier_id INTEGER
+  is_active TINYINT
+  created_at TIMESTAMP
+  updated_at TIMESTAMPLlama.generate: 815 prefix-match hit, remaining 130 prompt tokens to eval
+llama_perf_context_print:        load time =   53046.07 ms
+llama_perf_context_print: prompt eval time =   12114.68 ms /   130 tokens (   93.19 ms per token,    10.73 tokens per second)
+llama_perf_context_print:        eval time =    4842.86 ms /    31 runs   (  156.22 ms per token,     6.40 tokens per second)
+llama_perf_context_print:       total time =   16976.32 ms /   161 tokens
+I can query the schema of the order_details table now.
+Action: sql_db_schema
+Action Input: order_detailsCREATE TABLE order_details …
+  detail_id INTEGER
+  order_id INTEGER
+  product_id INTEGER
+  quantity INTEGER
+  unit_price DECIMAL(10, 2)
+  discount DECIMAL(5, 2)
+  subtotal DECIMAL(12, 2)Llama.generate: 944 prefix-match hit, remaining 119 prompt tokens to eval
+llama_perf_context_print:        load time =   53046.07 ms
+llama_perf_context_print: prompt eval time =   11503.45 ms /   119 tokens (   96.67 ms per token,    10.34 tokens per second)
+llama_perf_context_print:        eval time =    5576.95 ms /    35 runs   (  159.34 ms per token,     6.28 tokens per second)
+llama_perf_context_print:       total time =   17101.45 ms /   154 tokens
+I should query the schema of the inventory_transactions table now.
+Action: sql_db_schema
+Action Input: inventory_transactionsCREATE TABLE inventory_transactions …
+  transaction_id INTEGER
+  product_id INTEGER
+  transaction_type ENUM
+  subtotal DECIMAL(12, 2)Llama.generate: 944 prefix-match hit, remaining 119 prompt tokens to eval
+llama_perf_context_print:        load time =   53046.07 ms
+llama_perf_context_print: prompt eval time =   11503.45 ms /   119 tokens (   96.67 ms per token,    10.34 tokens per second)
+llama_perf_context_print:        eval time =    5576.95 ms /    35 runs   (  159.34 ms per token,     6.28 tokens per second)
+llama_perf_context_print:       total time =   17101.45 ms /   154 tokens
+I should query the schema of the inventory_transactions table now.
+Action: sql_db_schema
+Action Input: inventory_transactionsCREATE TABLE inventory_transactions …
+  transaction_id INTEGER
+  product_id INTEGER
+  transaction_type ENUM
+llama_perf_context_print:       total time =   17101.45 ms /   154 tokens
+I should query the schema of the inventory_transactions table now.
+Action: sql_db_schema
+Action Input: inventory_transactionsCREATE TABLE inventory_transactions …
+  transaction_id INTEGER
+  product_id INTEGER
+  transaction_type ENUM
+  quantity INTEGER
+  reference_id INTEGER
+  transaction_date TIMESTAMP
+  notes TEXTLlama.generate: 1062 prefix-match hit, remaining 101 prompt tokens to eval
+llama_perf_context_print:        load time =   53046.07 ms
+llama_perf_context_print: prompt eval time =    9991.71 ms /   101 tokens (   98.93 ms per token,    10.11 tokens per second)
+llama_perf_context_print:        eval time =    4407.74 ms /    27 runs   (  163.25 ms per token,     6.13 tokens per second)
+llama_perf_context_print:       total time =   14415.80 ms /   128 tokens
+I can query the schema of the customers table now.
+Action: sql_db_schema
+Action Input: customersCREATE TABLE customers …
+  customer_id INTEGER
+  company_name VARCHAR(100)
+  contact_name VARCHAR(100)
+  email VARCHAR(100)
+  phone VARCHAR(20)
+  address VARCHAR(200)
+  city VARCHAR(50)
+  country VARCHAR(50)
+  created_at TIMESTAMP
+  updated_at TIMESTAMPLlama.generate: 1162 prefix-match hit, remaining 128 prompt tokens to eval
+llama_perf_context_print:        load time =   53046.07 ms
+llama_perf_context_print: prompt eval time =   13750.27 ms /   128 tokens (  107.42 ms per token,     9.31 tokens per second)
+llama_perf_context_print:        eval time =    8219.54 ms /    48 runs   (  171.24 ms per token,     5.84 tokens per second)
+llama_perf_context_print:       total time =   22001.44 ms /   176 tokens
+I now have all the information I need to construct a query.
+Action: sql_db_query
+Action Input: SELECT * FROM products p WHERE p.product_name ilike '%wireless keyboard%' LIMIT 10;Error: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'ilike '%wireless keyboard%' LIMIT 10' at line 1")
+[SQL: SELECT * FROM products p WHERE p.product_name ilike '%%wireless keyboard%%' LIMIT 10;]
+(Background on this error at: https://sqlalche.me/e/20/f405)Llama.generate: 1289 prefix-match hit, remaining 179 prompt tokens to eval
+llama_perf_context_print:        load time =   53046.07 ms
+llama_perf_context_print: prompt eval time =   17873.73 ms /   179 tokens (   99.85 ms per token,    10.01 tokens per second)
+llama_perf_context_print:        eval time =    9125.19 ms /    54 runs   (  168.98 ms per token,     5.92 tokens per second)
+llama_perf_context_print:       total time =   27061.26 ms /   233 tokens
+I will rewrite the query to use the correct syntax.
+Action: sql_db_query_checker
+Action Input: SELECT * FROM products p WHERE p.product_name ilike '%%wireless keyboard%%' LIMIT 10;Llama.generate: 1 prefix-match hit, remaining 156 prompt tokens to eval
+llama_perf_context_print:        load time =   53046.07 ms
+llama_perf_context_print: prompt eval time =   14986.00 ms /   156 tokens (   96.06 ms per token,    10.41 tokens per second)
+llama_perf_context_print:        eval time =    4629.17 ms /    25 runs   (  185.17 ms per token,     5.40 tokens per second)
+llama_perf_context_print:       total time =   19629.78 ms /   181 tokens
+Llama.generate: 1 prefix-match hit, remaining 1552 prompt tokens to eval
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Ready!  Ask me anything about your database.
 
 ❓> give me the total count of pending orders
 
