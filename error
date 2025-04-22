@@ -1,3 +1,54 @@
+You: give me the orders placed in march 2025
+SQL:
+No SQL generated
+Error: (sqlite3.OperationalError) near "FROM": syntax error [SQL: SELECT o.order_id, o.customer_id, o.order_date, o.status, o.shipping_address, o.shipping_city, o.shipping_country, o.payment_method, o.total_amount FROM orders AS o WHERE EXTRACT(MONTH FROM o.order_date) = 3 AND EXTRACT(YEAR FROM o.order_date) = 2025] (Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 You: give me details about this product High Capacity SSD
 SQL:
 No SQL generated
