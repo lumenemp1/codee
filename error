@@ -1,3 +1,46 @@
+You: orders from march
+SQL:
+No SQL generated
+Error: (sqlite3.OperationalError) near "FROM": syntax error
+[SQL: SELECT o.order_id, c.company_name, o.order_date, p.product_name, 
+od.quantity, od.unit_price, od.discount, od.subtotal FROM orders AS o 
+JOIN customers AS c ON o.customer_id = c.customer_id JOIN order_details AS od ON o.order_id = 
+od.order_id JOIN products AS p ON od.product_id =
+p.product_id WHERE EXTRACT(MONTH FROM o.order_date) = 3]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 You: give me orders from march 2025
 SQL:
 No SQL generated
