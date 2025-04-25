@@ -1,3 +1,33 @@
+
+
+Avatar for Assistant
+📊 Generating charts based on query…
+Avatar for Assistant
+⚠️ Could not render Chart 1: Element.send() missing 1 required positional argument: 'for_id'
+Avatar for Assistant
+⚠️ Could not render Chart 2: Element.send() missing 1 required positional argument: 'for_id'
+Avatar for Assistant
+⚠️ Could not render Chart 3: Element.send() missing 1 required positional argument: 'for_id'
+Avatar for Assistant
+⚠️ Could not render Chart 4: Element.send() missing 1 required positional argument: 'for_id'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 📊 Generating charts based on query…
 Avatar for Assistant
 ⚠️ Could not render Chart 1: figure must be a plotly.graph_objects.Figure
