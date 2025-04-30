@@ -1,3 +1,40 @@
+Press CTRL+C to quit
+[pipeline] semantic search ok: [4 1 0]
+[pipeline] schema snipper ok
+[pipeline] prompt built
+[pipeline] Sending to gemini..
+[pipeline] Gemini Output :```sql
+SELECT * FROM products;
+```
+[pipeline] final sql:SELECT * FROM products;
+[swift] semantic search ok: [8 7 3]
+[swift] schema snipper ok
+[swift] prompt built
+[swift] Sending to gemini..
+[swift] Gemini Output :```sql
+SELECT * FROM products;
+```
+[swift] final sql:SELECT * FROM products;
+127.0.0.1 - - [30/Apr/2025 14:22:30] "POST /api/query HTTP/1.1" 200 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 {
    "question":"give me the list of all  products ",
    "selected_dbs":["chatbot","pipeline"]
