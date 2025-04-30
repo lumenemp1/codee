@@ -1,3 +1,302 @@
+{
+   "question":"give me the list of all  products ",
+   "selected_dbs":["chatbot","pipeline"]
+}
+
+
+
+
+
+[
+    {
+        "charts": ["{\"data\":[{\"hovertemplate\":\"category=Hardware\<br\>product_name=%{x}\<br\>unit_price=%{y}\<extra\>\<\/extra\>\",\"legendgroup\":\"Hardware\",\"marker\":{\"color\":\"#636efa\",\"pattern\":{\"shape\":\"\"}},\"name\":\"Hardware\",\"orientation\":\"v\",\"showlegend\":true,\"textposition\":\"auto\",\"x\":[\"Enterprise Server X1\",\"24-inch Monitor\",\"UPS Battery Backup\",\"Smart Conference Speaker\",\"Network Switch\",\"Power Distribution Unit\"],\"xaxis\":\"x\",\"y\":[2499.99,349.99,299.99,249.99,349.99,189.99],\"yaxis\":\"y\",\"type\":\"bar\"},
+
+],
+        "db": "chatbot",
+        "results": [
+            {
+                "category": "Hardware",
+                "created_at": "Fri, 04 Apr 2025 17:28:56 GMT",
+                "description": "High-performance server for medium businesses",
+                "is_active": 1,
+                "product_id": 1,
+                "product_name": "Enterprise Server X1",
+                "stock_quantity": 15,
+                "supplier_id": 1,
+                "unit_price": "2499.99",
+                "updated_at": "Fri, 04 Apr 2025 17:28:56 GMT"
+            },
+            {
+                "category": "Software",
+                "created_at": "Fri, 04 Apr 2025 17:28:56 GMT",
+                "description": "Managed cloud storage service - annual license",
+                "is_active": 1,
+                "product_id": 2,
+                "product_name": "Cloud Storage Solution",
+                "stock_quantity": 100,
+                "supplier_id": 2,
+                "unit_price": "899.50",
+                "updated_at": "Fri, 04 Apr 2025 17:28:56 GMT"
+            },
+            {
+                "category": "Software",
+                "created_at": "Fri, 04 Apr 2025 17:28:56 GMT",
+                "description": "Complete security package with firewall and intrusion detection",
+                "is_active": 1,
+                "product_id": 3,
+                "product_name": "Network Security Suite",
+                "stock_quantity": 30,
+                "supplier_id": 2,
+                "unit_price": "1299.99",
+                "updated_at": "Fri, 04 Apr 2025 17:28:56 GMT"
+            },
+            {
+                "category": "Hardware",
+                "created_at": "Fri, 04 Apr 2025 17:28:56 GMT",
+                "description": "Ultra HD professional monitor",
+                "is_active": 1,
+                "product_id": 4,
+                "product_name": "24-inch Monitor",
+                "stock_quantity": 50,
+                "supplier_id": 3,
+                "unit_price": "349.99",
+                "updated_at": "Fri, 04 Apr 2025 17:28:56 GMT"
+            },
+            {
+                "category": "Accessories",
+                "created_at": "Fri, 04 Apr 2025 17:28:56 GMT",
+                "description": "Ergonomic wireless keyboard",
+                "is_active": 1,
+                "product_id": 5,
+                "product_name": "Wireless Keyboard",
+                "stock_quantity": 200,
+                "supplier_id": 3,
+                "unit_price": "79.99",
+                "updated_at": "Fri, 04 Apr 2025 17:28:56 GMT"
+            },
+            {
+                "category": "Software",
+                "created_at": "Fri, 04 Apr 2025 17:28:56 GMT",
+                "description": "Productivity suite for businesses",
+                "is_active": 1,
+                "product_id": 6,
+                "product_name": "Office Software Bundle",
+                "stock_quantity": 150,
+                "supplier_id": 2,
+                "unit_price": "599.99",
+                "updated_at": "Fri, 04 Apr 2025 17:28:56 GMT"
+            },
+            {
+                "category": "Hardware",
+                "created_at": "Fri, 04 Apr 2025 17:28:56 GMT",
+                "description": "Uninterruptible power supply for servers",
+                "is_active": 1,
+                "product_id": 7,
+                "product_name": "UPS Battery Backup",
+                "stock_quantity": 25,
+                "supplier_id": 1,
+                "unit_price": "299.99",
+                "updated_at": "Fri, 04 Apr 2025 17:28:56 GMT"
+            },
+            {
+                "category": "Accessories",
+                "created_at": "Fri, 04 Apr 2025 17:28:56 GMT",
+                "description": "Universal docking station with multiple ports",
+                "is_active": 1,
+                "product_id": 8,
+                "product_name": "USB-C Dock",
+                "stock_quantity": 75,
+                "supplier_id": 3,
+                "unit_price": "129.99",
+                "updated_at": "Fri, 04 Apr 2025 17:28:56 GMT"
+            },
+            {
+                "category": "Storage",
+                "created_at": "Fri, 04 Apr 2025 22:34:28 GMT",
+                "description": "2TB solid state drive for enterprise systems",
+                "is_active": 1,
+                "product_id": 9,
+                "product_name": "High Capacity SSD",
+                "stock_quantity": 40,
+                "supplier_id": 1,
+                "unit_price": "399.99",
+                "updated_at": "Fri, 04 Apr 2025 22:34:28 GMT"
+            },
+            {
+                "category": "Accessories",
+                "created_at": "Fri, 04 Apr 2025 22:34:28 GMT",
+                "description": "Noise-cancelling wireless headset for office use",
+                "is_active": 1,
+                "product_id": 10,
+                "product_name": "Wireless Headset",
+                "stock_quantity": 100,
+                "supplier_id": 3,
+                "unit_price": "159.99",
+                "updated_at": "Fri, 04 Apr 2025 22:34:28 GMT"
+            },
+            {
+                "category": "Software",
+                "created_at": "Fri, 04 Apr 2025 22:34:28 GMT",
+                "description": "Enterprise database management system - license per user",
+                "is_active": 1,
+                "product_id": 11,
+                "product_name": "Database Software",
+                "stock_quantity": 50,
+                "supplier_id": 2,
+                "unit_price": "799.99",
+                "updated_at": "Fri, 04 Apr 2025 22:34:28 GMT"
+            },
+            {
+                "category": "Hardware",
+                "created_at": "Fri, 04 Apr 2025 22:34:28 GMT",
+                "description": "AI-powered conference room speaker with noise reduction",
+                "is_active": 1,
+                "product_id": 12,
+                "product_name": "Smart Conference Speaker",
+                "stock_quantity": 30,
+                "supplier_id": 4,
+                "unit_price": "249.99",
+                "updated_at": "Fri, 04 Apr 2025 22:34:28 GMT"
+            },
+            {
+                "category": "Hardware",
+                "created_at": "Fri, 04 Apr 2025 22:34:28 GMT",
+                "description": "24-port managed network switch",
+                "is_active": 1,
+                "product_id": 13,
+                "product_name": "Network Switch",
+                "stock_quantity": 25,
+                "supplier_id": 1,
+                "unit_price": "349.99",
+                "updated_at": "Fri, 04 Apr 2025 22:34:28 GMT"
+            },
+            {
+                "category": "Software",
+                "created_at": "Fri, 04 Apr 2025 22:34:28 GMT",
+                "description": "Enterprise project management software - annual license",
+                "is_active": 1,
+                "product_id": 14,
+                "product_name": "Project Management Suite",
+                "stock_quantity": 60,
+                "supplier_id": 2,
+                "unit_price": "899.99",
+                "updated_at": "Fri, 04 Apr 2025 22:34:28 GMT"
+            },
+            {
+                "category": "Hardware",
+                "created_at": "Fri, 04 Apr 2025 22:34:28 GMT",
+                "description": "Smart PDU for server racks",
+                "is_active": 1,
+                "product_id": 15,
+                "product_name": "Power Distribution Unit",
+                "stock_quantity": 35,
+                "supplier_id": 1,
+                "unit_price": "189.99",
+                "updated_at": "Fri, 04 Apr 2025 22:34:28 GMT"
+            },
+            {
+                "category": "Software",
+                "created_at": "Fri, 04 Apr 2025 22:34:28 GMT",
+                "description": "Network security solution for 100 endpoints",
+                "is_active": 1,
+                "product_id": 16,
+                "product_name": "Anti-virus Enterprise",
+                "stock_quantity": 20,
+                "supplier_id": 5,
+                "unit_price": "1299.99",
+                "updated_at": "Fri, 04 Apr 2025 22:34:28 GMT"
+            }
+        ],
+        "sql": "SELECT * FROM products;"
+    },
+    {
+        "charts": [],
+        "db": "pipeline",
+        "error": "Expecting value: line 1 column 1 (char 0)",
+        "results": [],
+        "sql": null
+    }
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 Avatar for Assistant
