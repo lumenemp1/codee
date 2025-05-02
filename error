@@ -1,3 +1,192 @@
+PS C:\Users\AD54619\Text2Sql\gemini\multidb> chainlit run ui.py -w
+2025-05-02 10:54:25 - Your app is available at http://localhost:8000
+2025-05-02 10:54:26 - Translated markdown file for en-US not found. Defaulting to chainlit.md.
+2025-05-02 10:54:27 - 1 validation error for Action
+payload
+  Field required [type=missing, input_value=ArgsKwargs((), {'name': '...n', 'value': 'chatbot'}), input_type=ArgsKwargs]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+Traceback (most recent call last):
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\chainlit\utils.py", line 47, in wrapper
+    return await user_function(**params_values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\chainlit\step.py", line 118, in async_wrapper
+    result = await func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\gemini\multidb\ui.py", line 35, in start_chat
+    cl.Action(name=f"toggle_{key}", label=label, value=key)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\pydantic\_internal\_dataclasses.py", line 120, in __init__
+    s.__pydantic_validator__.validate_python(ArgsKwargs(args, kwargs), self_instance=s)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for Action
+payload
+  Field required [type=missing, input_value=ArgsKwargs((), {'name': '...n', 'value': 'chatbot'}), input_type=ArgsKwargs]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-05-02 10:54:31 - 1 validation error for Action
+payload
+  Field required [type=missing, input_value=ArgsKwargs((), {'name': '...n', 'value': 'chatbot'}), input_type=ArgsKwargs]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+Traceback (most recent call last):
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\chainlit\utils.py", line 47, in wrapper
+    return await user_function(**params_values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\chainlit\step.py", line 118, in async_wrapper
+    result = await func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\gemini\multidb\ui.py", line 35, in start_chat
+    cl.Action(name=f"toggle_{key}", label=label, value=key)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\pydantic\_internal\_dataclasses.py", line 120, in __init__
+    s.__pydantic_validator__.validate_python(ArgsKwargs(args, kwargs), self_instance=s)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for Action
+payload
+  Field required [type=missing, input_value=ArgsKwargs((), {'name': '...n', 'value': 'chatbot'}), input_type=ArgsKwargs]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-05-02 10:58:30 - 1 change detected
+2025-05-02 10:58:30 - File modified: ui.py. Reloading app...
+2025-05-02 10:58:32 - Translated markdown file for en-US not found. Defaulting to chainlit.md.
+2025-05-02 10:58:32 - Translated markdown file for en-US not found. Defaulting to chainlit.md.
+2025-05-02 10:58:33 - AskActionMessage.__init__() got an unexpected keyword argument 'callback'
+Traceback (most recent call last):
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\chainlit\utils.py", line 47, in wrapper
+    return await user_function(**params_values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\chainlit\step.py", line 118, in async_wrapper
+    result = await func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\gemini\multidb\ui.py", line 20, in start_chat
+    await cl.AskActionMessage(
+          ~~~~~~~~~~~~~~~~~~~^
+        content="Select databases, then Done:",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<14 lines>...
+        callback=handle_db_selection
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).send()
+    ^
+TypeError: AskActionMessage.__init__() got an unexpected keyword argument 'callback'
+2025-05-02 10:58:33 - AskActionMessage.__init__() got an unexpected keyword argument 'callback'
+Traceback (most recent call last):
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\chainlit\utils.py", line 47, in wrapper
+    return await user_function(**params_values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\chainlit\step.py", line 118, in async_wrapper
+    result = await func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\gemini\multidb\ui.py", line 20, in start_chat
+    await cl.AskActionMessage(
+          ~~~~~~~~~~~~~~~~~~~^
+        content="Select databases, then Done:",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<14 lines>...
+        callback=handle_db_selection
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).send()
+    ^
+TypeError: AskActionMessage.__init__() got an unexpected keyword argument 'callback'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 2025-05-02 10:51:53 - Your app is available at http://localhost:8000
 2025-05-02 10:51:55 - 1 change detected
 2025-05-02 10:51:55 - 1 change detected
