@@ -1,3 +1,90 @@
+2025-05-02 10:51:53 - Your app is available at http://localhost:8000
+2025-05-02 10:51:55 - 1 change detected
+2025-05-02 10:51:55 - 1 change detected
+2025-05-02 10:51:55 - Translated markdown file for en-US not found. Defaulting to chainlit.md.
+2025-05-02 10:51:55 - 1 change detected
+2025-05-02 10:51:56 - 1 validation error for Action
+payload
+  Field required [type=missing, input_value=ArgsKwargs((), {'name': '...atbot', 'label': 'Eon'}), input_type=ArgsKwargs]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+Traceback (most recent call last):
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\chainlit\utils.py", line 47, in wrapper
+    return await user_function(**params_values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\chainlit\step.py", line 118, in async_wrapper
+    result = await func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\gemini\multidb\ui.py", line 37, in start_chat
+    cl.Action(name=f"toggle_{key}", label=label)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\pydantic\_internal\_dataclasses.py", line 120, in __init__
+    s.__pydantic_validator__.validate_python(ArgsKwargs(args, kwargs), self_instance=s)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for Action
+payload
+  Field required [type=missing, input_value=ArgsKwargs((), {'name': '...atbot', 'label': 'Eon'}), input_type=ArgsKwargs]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 S C:\Users\AD54619\Text2Sql\gemini> chainlit run ui.py -w
 2025-04-30 16:20:16 - Your app is available at http://localhost:8000
 2025-04-30 16:20:18 - Translated markdown file for en-US not found. Defaulting to chainlit.md.
