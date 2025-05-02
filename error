@@ -1,3 +1,197 @@
+S C:\Users\AD54619\Text2Sql\gemini> chainlit run ui.py -w
+2025-04-30 16:20:16 - Your app is available at http://localhost:8000
+2025-04-30 16:20:18 - Translated markdown file for en-US not found. Defaulting to chainlit.md.
+2025-04-30 16:20:18 - 'Multiselect'
+Traceback (most recent call last):
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\chainlit\utils.py", line 47, in wrapper
+    return await user_function(params_values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\chainlit\step.py", line 118, in async_wrapper
+    result = await func(*args, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\gemini\ui.py", line 15, in start_chat
+    await cl.Multiselect(
+          ^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\chainlit\utils.py", line 73, in getattr
+    module_path = registry[name]
+                  ~~~~~~~~^^^^^^
+KeyError: 'Multiselect'
+2025-04-30 16:20:18 - 'Multiselect'
+Traceback (most recent call last):
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\chainlit\utils.py", line 47, in wrapper
+    return await user_function(params_values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\chainlit\step.py", line 118, in async_wrapper
+    result = await func(*args, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\gemini\ui.py", line 15, in start_chat
+    await cl.Multiselect(
+          ^^^^^^^^^^^^^^
+  File "C:\Users\AD54619\Text2Sql\virtualen\Lib\site-packages\chainlit\utils.py", line 73, in getattr
+    module_path = registry[name]
+                  ~~~~~~~~^^^^^^
+KeyError: 'Multiselect'
+import chainlit as cl
+import aiohttp
+import datetime
+import asyncio
+import json
+
+url = "http://127.0.0.1:5000/api/query"
+
+@cl.on_chat_start
+async def start_chat():
+    await cl.Message(content=get_greeting()).send()
+
+    # Render DB selector manually
+    await cl.Message(content="Please select the databases you want to query:").send()
+    await cl.Multiselect(
+        name="db_selection",
+        label="Databases",
+        options=[
+            "chatbot",  # Eon
+            "pipeline", # Pipeline
+            "swift"     # Swift Orders
+        ],
+        required=True
+    ).send()
+
+@cl.on_message
+async def main(message: cl.Message):
+    await cl.Message(content="🔄 Processing your query…").send()
+
+    selected_dbs = cl.user_session.get("db_selection")
+    if not selected_dbs:
+        await cl.Message(content="⚠️ Please select at least one database first.").send()
+        return
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                url,
+                json={"question": message.content, "selected_dbs": selected_dbs},
+                timeout=aiohttp.ClientTimeout(total=600)
+            ) as response:
+
+                if response.status != 200:
+                    error = await response.text()
+                    await cl.Message(content=f"❌ Server error {response.status}: {error}").send()
+                    return
+
+                all_results = await response.json()
+
+                if not isinstance(all_results, list):
+                    await cl.Message(content="⚠️ Unexpected response format.").send()
+                    return
+
+                for db_entry in all_results:
+                    db_name = db_entry.get("db", "unknown").capitalize()
+
+                    # Show SQL
+                    sql = db_entry.get("sql", "")
+                    if sql:
+                        await cl.Message(content=f"### 🧠 Query for {db_name}\nsql\n{sql}\n").send()
+                    else:
+                        await cl.Message(content=f"⚠️ No SQL generated for {db_name}.").send()
+                        continue
+
+                    # Show Results Table
+                    rows = db_entry.get("results", [])
+                    if rows:
+                        headers = list(rows[0].keys())
+                        md = f"### 📋 Results from {db_name}\n\n| " + " | ".join(headers) + " |\n"
+                        md += "| " + " | ".join(["---"] * len(headers)) + " |\n"
+                        for row in rows:
+                            vals = [str(row.get(h, "")).replace("|", "\\|") for h in headers]
+                            md += "| " + " | ".join(vals) + " |\n"
+                        await cl.Message(content=md).send()
+                    else:
+                        await cl.Message(content=f"⚠️ No results returned from {db_name}.").send()
+
+    except asyncio.TimeoutError:
+        await cl.Message(content="⏱️ Model timed out. Try a simpler query.").send()
+    except aiohttp.ClientConnectorError as conn_err:
+        await cl.Message(content=f"🔌 Could not connect to backend: {conn_err}").send()
+    except Exception as e:
+        await cl.Message(content=f"🔥 Error: {type(e).name} - {e}").send()
+
+def get_greeting():
+    now = datetime.datetime.now().hour
+    if now < 12:
+        return "Good Morning! How can I assist you today?"
+    elif now < 18:
+        return "Good Afternoon! How can I assist you today?"
+    else:
+        return "Good Evening! How can I assist you today?"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import time  # Add this at the top
 
 def process_question(question: str, selected_dbs: List[str]) -> List[dict]:
