@@ -1,3 +1,69 @@
+[
+    {
+        "db": "swift_orders",
+        "error": "'swift_orders'",
+        "results": [],
+        "sql": null
+    },
+    {
+        "db": "chatbot",
+        "results": [],
+        "sql": "SELECT\n  p.product_name\nFROM products AS p\nJOIN order_details AS od\n  ON p.product_id = od.product_id\nWHERE\n  p.product_name IN ('eon', 'swift', 'pipeline')\nGROUP BY\n  p.product_name\nORDER BY\n  SUM(od.quantity)\nLIMIT 1;"
+    },
+    {
+        "db": "pipeline",
+        "results": [],
+        "sql": "SELECT\n  p.name\nFROM products AS p\nJOIN order_items AS oi\n  ON p.product_id = oi.product_id\nWHERE\n  p.name IN ('eon', 'swift', 'pipeline')\nGROUP BY\n  p.product_id\nORDER BY\n  SUM(oi.quantity)\nLIMIT 1;"
+    }
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 PS C:\Users\AD54619\Text2Sql\gemini\multidb> chainlit run ui.py -w
 2025-05-02 10:54:25 - Your app is available at http://localhost:8000
 2025-05-02 10:54:26 - Translated markdown file for en-US not found. Defaulting to chainlit.md.
