@@ -1,3 +1,18 @@
+
+
+{
+   "question":"Order details with customer and product information",
+   "selected_dbs":["chatbot","swift","pipeline"]
+}
+
+
+
+
+
+
+
+
+
 [
     {
         "db": "swift_orders",
