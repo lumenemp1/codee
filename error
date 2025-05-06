@@ -1,3 +1,25 @@
+PS C:\Users\AD54619\Text2Sql\gemini\multidb> python testchart.py
+✅ Merged DataFrame:
+  product_name  total_orders database
+0      Printer            20      eon
+1      Scanner            15      eon
+2      Monitor            30      eon
+3      Printer            25    swift
+4      Scanner            18    swift
+5      Monitor            22    swift
+Traceback (most recent call last):
+  File "C:\Users\AD54619\Text2Sql\gemini\multidb\testchart.py", line 197, in <module>
+    figures[0].show()
+    ~~~~~~~^^^
+IndexError: list index out of range
+
+
+
+
+
+
+
+
 
 
 #-------------------------------------------
