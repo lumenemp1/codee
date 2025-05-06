@@ -7,11 +7,22 @@ PS C:\Users\AD54619\Text2Sql\gemini\multidb> python testchart.py
 3      Printer            25    swift
 4      Scanner            18    swift
 5      Monitor            22    swift
-Traceback (most recent call last):
-  File "C:\Users\AD54619\Text2Sql\gemini\multidb\testchart.py", line 197, in <module>
-    figures[0].show()
-    ~~~~~~~^^^
-IndexError: list index out of range
+chart config {
+  "chart_type": "bar",
+  "x_axis": {
+    "standard": "product_name",
+    "eon": "product_name",
+    "swift": "name"
+  },
+  "y_axis": {
+    "standard": "total_orders",
+    "eon": "total_qty",
+    "swift": "COUNT(order_id)"
+  },
+  "group_by": "database"
+}
+No chart was generated
+PS C:\Users\AD54619\Text2Sql\gemini\multidb> 
 
 
 
