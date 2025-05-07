@@ -1,3 +1,43 @@
+sql_by_db {'swift': 'SELECT\n  p.product_name\nFROM products AS p\nLEFT JOIN order_items AS oi\n  ON p.product_id = oi.product_id\nGROUP BY\n  p.product_name\nORDER BY\n  COUNT(oi.product_id)\nLIMIT 1;', 'eon': 'SELECT\n  p.product_name\nFROM products AS p\nLEFT JOIN order_details AS od\n  ON p.product_id = od.product_id\nGROUP BY\n  p.product_id\nORDER BY\n  SUM(od.quantity) ASC\nLIMIT 1;'}
+all results[{'db': 'swift', 'sql': 'SELECT\n  p.product_name\nFROM products AS p\nLEFT JOIN order_items AS oi\n  ON p.product_id = oi.product_id\nGROUP BY\n  p.product_name\nORDER BY\n  COUNT(oi.product_id)\nLIMIT 1;', 'results': [{'product_name': 'Smartphone X'}]}, {'db': 'eon', 'sql': 'SELECT\n  p.product_name\nFROM products AS p\nLEFT JOIN order_details AS od\n  ON p.product_id = od.product_id\nGROUP BY\n  p.product_id\nORDER BY\n  SUM(od.quantity) ASC\nLIMIT 1;', 'results': [{'product_name': 'Cloud Storage Solution'}]}]
+char_config{'chart_type': 'bar', 'x_axis': {'standard': 'product_name', 'eon': 'product_name', 'swift': 'product_name'}, 'y_axis': {'standard': 'total_orders', 'eon': 'order_qty', 'swift': 'stock_quantity'}, 'group_by': 'database'} 
+
+{
+   "question":"least ordered product",
+   "selected_dbs":["swift","eon"]
+}
+
+{
+    "error": "\"['total_orders'] not in index\""
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def process_question(question: str, selected_dbs: List[str]) -> Dict[str, Any]:
     all_results = []
 
