@@ -1,3 +1,54 @@
+def normalize_and_merge_results(all_results: List[Dict[str, Any]], chart_mapping: Dict[str, Any]) -> pd.DataFrame:
+    frames = []
+    for result in all_results:
+        db_key = result["db"]
+        rows = result["results"]
+        if not rows:
+            continue
+        df = pd.DataFrame(rows)
+        x_map = chart_mapping["x_axis"].get(db_key)
+        y_map = chart_mapping["y_axis"].get(db_key)
+        x_std = chart_mapping["x_axis"].get("standard", "x")
+        y_std = chart_mapping["y_axis"].get("standard", "y")
+
+        if x_map and x_map in df.columns:
+            df = df.rename(columns={x_map: x_std})
+        if y_map and y_map in df.columns:
+            df = df.rename(columns={y_map: y_std})
+
+        df["database"] = db_key
+        frames.append(df[[x_std, y_std, "database"]])
+
+    return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 sql_by_db {'swift': 'SELECT\n  p.product_name\nFROM products AS p\nLEFT JOIN order_items AS oi\n  ON p.product_id = oi.product_id\nGROUP BY\n  p.product_name\nORDER BY\n  COUNT(oi.product_id)\nLIMIT 1;', 'eon': 'SELECT\n  p.product_name\nFROM products AS p\nLEFT JOIN order_details AS od\n  ON p.product_id = od.product_id\nGROUP BY\n  p.product_id\nORDER BY\n  SUM(od.quantity) ASC\nLIMIT 1;'}
 all results[{'db': 'swift', 'sql': 'SELECT\n  p.product_name\nFROM products AS p\nLEFT JOIN order_items AS oi\n  ON p.product_id = oi.product_id\nGROUP BY\n  p.product_name\nORDER BY\n  COUNT(oi.product_id)\nLIMIT 1;', 'results': [{'product_name': 'Smartphone X'}]}, {'db': 'eon', 'sql': 'SELECT\n  p.product_name\nFROM products AS p\nLEFT JOIN order_details AS od\n  ON p.product_id = od.product_id\nGROUP BY\n  p.product_id\nORDER BY\n  SUM(od.quantity) ASC\nLIMIT 1;', 'results': [{'product_name': 'Cloud Storage Solution'}]}]
 char_config{'chart_type': 'bar', 'x_axis': {'standard': 'product_name', 'eon': 'product_name', 'swift': 'product_name'}, 'y_axis': {'standard': 'total_orders', 'eon': 'order_qty', 'swift': 'stock_quantity'}, 'group_by': 'database'} 
