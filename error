@@ -1,3 +1,456 @@
+
+def generate_chart_suggestions(question: str, sql_by_db: Dict[str, str]) -> Dict[str, Any]:
+    """
+    Use Gemini to suggest a standardized chart config based on SQL queries from multiple databases.
+    """
+
+    # Compose SQL snippet section
+    sql_section = ""
+    for db, sql in sql_by_db.items():
+        sql_section += f"-- Query from {db}:\n{sql.strip()}\n\n"
+
+    # Prompt for Gemini
+    prompt = f"""
+You are a chart assistant helping to unify visualizations across multiple databases.
+
+The user has asked:
+{question}
+
+Below are SQL queries generated for each database. Your task:
+1. Understand the semantic meaning of each column.
+2. Suggest a standard schema for charting (e.g., x_axis: product, y_axis: order count).
+3. Return the mappings from actual column names in each DB to the standard names.
+4. Suggest a suitable chart type for comparative display (e.g., bar chart grouped by source DB).
+
+### SQL Queries:
+{sql_section}
+
+### Desired Output JSON format:
+{{
+  "chart_type": "bar",
+  "x_axis": {{
+    "standard": "product_name",
+    "eon": "product_name",
+    "swift": "name"
+  }},
+  "y_axis": {{
+    "standard": "total_orders",
+    "eon": "total_qty",
+    "swift": "COUNT(order_id)"
+  }},
+  "group_by": "database"
+}}
+"""
+
+    # Prepare API payload
+    payload = {"contents": [{"parts": [{"text": prompt}]}]}
+    headers = {"Content-Type": "application/json"}
+
+    # Call Gemini API
+    response = requests.post(GEMINI_URL, headers=headers, json=payload)
+    response.raise_for_status()
+    data = response.json()
+
+    # Try extracting the charts_json
+    charts_json = None
+    try:
+        if "candidates" in data and data["candidates"]:
+            candidate = data["candidates"][0]
+            content = candidate.get("content")
+            if isinstance(content, dict) and "parts" in content:
+                charts_json = content["parts"][0].get("text")
+            elif isinstance(content, str):
+                charts_json = content
+    except Exception as e:
+        print("❌ Unexpected Gemini response structure.")
+        print(json.dumps(data, indent=2))
+        raise e
+
+    # Parse charts_json into Python dict
+    if charts_json:
+        try:
+            return json.loads(charts_json)
+        except json.JSONDecodeError:
+            # Try cleaning and retry
+            cleaned = charts_json.strip().strip("```json").strip("```").strip()
+            try:
+                return json.loads(cleaned)
+            except json.JSONDecodeError as inner_error:
+                print("❌ Failed to parse chart config even after cleaning. Raw response:")
+                print(repr(cleaned))
+                raise inner_error
+
+    print("⚠️ No chart configuration returned by Gemini.")
+    return {}
+
+
+# -----------------------------
+# Plotting Helpers
+# -----------------------------
+def normalize_and_merge_results(all_results: List[Dict[str, Any]], chart_mapping: Dict[str, Any]) -> pd.DataFrame:
+    frames = []
+    for result in all_results:
+        db_key = result["db"]
+        rows = result["results"]
+        if not rows:
+            continue
+        df = pd.DataFrame(rows)
+        x_map = chart_mapping["x_axis"].get(db_key)
+        y_map = chart_mapping["y_axis"].get(db_key)
+        x_std = chart_mapping["x_axis"].get("standard", "x")
+        y_std = chart_mapping["y_axis"].get("standard", "y")
+
+        if x_map and x_map in df.columns:
+            df = df.rename(columns={x_map: x_std})
+        if y_map and y_map in df.columns:
+            df = df.rename(columns={y_map: y_std})
+
+        df["database"] = db_key
+        frames.append(df[[x_std, y_std, "database"]])
+
+    return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
+
+def fallback_table(df: pd.DataFrame) -> go.Figure:
+    return go.Figure(data=[go.Table(
+        header=dict(values=list(df.columns)),
+        cells=dict(values=[df[col] for col in df.columns])
+    )])
+
+def plot_charts_from_config(df: pd.DataFrame, chart_config: Dict[str, Any]) -> List[Any]:
+    figs: List[Any] = []
+
+    # ✅ Fallback if `charts` not explicitly provided
+    charts = chart_config.get("charts")
+    if not charts:
+        charts = [{"chart_type": chart_config.get("chart_type", "bar")}]
+
+    for chart in charts:
+        chart_type = chart.get("chart_type", "bar").lower().replace(" ", "_")
+        plot_fn = getattr(px, chart_type, None)
+
+        kwargs = {
+            "x": chart_config["x_axis"]["standard"],
+            "y": chart_config["y_axis"]["standard"],
+            "color": chart_config.get("group_by", "database")
+        }
+
+        if callable(plot_fn):
+            try:
+                fig = plot_fn(df, **kwargs)
+            except Exception as e:
+                print(f"⚠️ Plot failed: {e}")
+                fig = fallback_table(df)
+        else:
+            fig = fallback_table(df)
+
+        figs.append(fig)
+
+    return figs
+
+#---------------------------
+#main
+#---------------------------
+
+def process_question(question: str, selected_dbs: List[str]) -> Dict[str, Any]:
+    all_results = []
+
+    for db_key in selected_dbs:
+        try:
+            resource = DB_RESOURCES[db_key]
+            embed_model = resource["embed_model"]
+            faiss_index = resource["faiss_index"]
+            metadata = resource["metadata"]
+            rev_fk_map = resource["rev_fk_map"]
+            db_uri = resource["db_uri"]
+
+            # 1. Semantic search
+            idxs = semantic_search(question, embed_model, faiss_index, TOP_K)
+            tables = expand_with_related(idxs, metadata, rev_fk_map)
+            schema_text = build_schema_snippet(tables, metadata)
+
+            # 2. Prompt creation
+            prompt = PROMPT_TEMPLATE.format(
+                question=question,
+                schema=schema_text,
+                dialect=DIALECT
+            )
+
+            # 3. SQL generation
+            gen_output = generate_sql_with_gemini(prompt)
+            final_sql = gen_output.strip().lstrip("```sql").rstrip("```").strip()
+
+            # 4. SQL execution
+            engine = create_engine(db_uri)
+            try:
+                with engine.connect() as conn:
+                    rows = [dict(r._mapping) for r in conn.execute(text(final_sql)).fetchall()]
+            except Exception as db_err:
+                print(f"[{db_key}] SQL error, retrying: {db_err}")
+                corrected_sql = retry_sql_with_error_context(
+                    question, schema_text, final_sql, str(db_err), DIALECT
+                )
+                with engine.connect() as conn:
+                    rows = [dict(r._mapping) for r in conn.execute(text(corrected_sql)).fetchall()]
+                final_sql = corrected_sql
+
+            all_results.append({
+                "db": db_key,
+                "sql": final_sql,
+                "results": rows
+            })
+
+        except Exception as e:
+            all_results.append({
+                "db": db_key,
+                "sql": None,
+                "results": [],
+                "error": str(e)
+            })
+
+    sql_by_db = {res["db"]: res["sql"] for res in all_results if res.get("sql")}
+    # 5. Get chart suggestion from Gemini using SQL queries
+    chart_config = generate_chart_suggestions(question,sql_by_db)
+
+    # 6. Normalize data for plotting
+    merged_df = normalize_and_merge_results(all_results, chart_config)
+    print(merged_df)
+
+    # 7. Generate Plotly figures
+    figures = plot_charts_from_config(merged_df, chart_config)
+
+    return {
+        "raw_results": all_results,
+        "chart_config": chart_config,
+        "charts": figures
+    }
+
+
+
+
+
+def generate_chart_suggestions(question: str, sql_by_db: Dict[str, str]) -> Dict[str, Any]:
+    """
+    Use Gemini to suggest a standardized chart config based on SQL queries from multiple databases.
+    """
+
+    # Compose SQL snippet section
+    sql_section = ""
+    for db, sql in sql_by_db.items():
+        sql_section += f"-- Query from {db}:\n{sql.strip()}\n\n"
+
+    # Prompt for Gemini
+    prompt = f"""
+You are a chart assistant helping to unify visualizations across multiple databases.
+
+The user has asked:
+{question}
+
+Below are SQL queries generated for each database. Your task:
+1. Understand the semantic meaning of each column.
+2. Suggest a standard schema for charting (e.g., x_axis: product, y_axis: order count).
+3. Return the mappings from actual column names in each DB to the standard names.
+4. Suggest a suitable chart type for comparative display (e.g., bar chart grouped by source DB).
+
+### SQL Queries:
+{sql_section}
+
+### Desired Output JSON format:
+{{
+  "chart_type": "bar",
+  "x_axis": {{
+    "standard": "product_name",
+    "eon": "product_name",
+    "swift": "name"
+  }},
+  "y_axis": {{
+    "standard": "total_orders",
+    "eon": "total_qty",
+    "swift": "COUNT(order_id)"
+  }},
+  "group_by": "database"
+}}
+"""
+
+    # Prepare API payload
+    payload = {"contents": [{"parts": [{"text": prompt}]}]}
+    headers = {"Content-Type": "application/json"}
+
+    # Call Gemini API
+    response = requests.post(GEMINI_URL, headers=headers, json=payload)
+    response.raise_for_status()
+    data = response.json()
+
+    # Try extracting the charts_json
+    charts_json = None
+    try:
+        if "candidates" in data and data["candidates"]:
+            candidate = data["candidates"][0]
+            content = candidate.get("content")
+            if isinstance(content, dict) and "parts" in content:
+                charts_json = content["parts"][0].get("text")
+            elif isinstance(content, str):
+                charts_json = content
+    except Exception as e:
+        print("❌ Unexpected Gemini response structure.")
+        print(json.dumps(data, indent=2))
+        raise e
+
+    # Parse charts_json into Python dict
+    if charts_json:
+        try:
+            return json.loads(charts_json)
+        except json.JSONDecodeError:
+            # Try cleaning and retry
+            cleaned = charts_json.strip().strip("```json").strip("```").strip()
+            try:
+                return json.loads(cleaned)
+            except json.JSONDecodeError as inner_error:
+                print("❌ Failed to parse chart config even after cleaning. Raw response:")
+                print(repr(cleaned))
+                raise inner_error
+
+    print("⚠️ No chart configuration returned by Gemini.")
+    return {}
+
+
+# -----------------------------
+# Plotting Helpers
+# -----------------------------
+def normalize_and_merge_results(all_results: List[Dict[str, Any]], chart_mapping: Dict[str, Any]) -> pd.DataFrame:
+    frames = []
+    for result in all_results:
+        db_key = result["db"]
+        rows = result["results"]
+        if not rows:
+            continue
+        df = pd.DataFrame(rows)
+        x_map = chart_mapping["x_axis"].get(db_key)
+        y_map = chart_mapping["y_axis"].get(db_key)
+        x_std = chart_mapping["x_axis"].get("standard", "x")
+        y_std = chart_mapping["y_axis"].get("standard", "y")
+
+        if x_map and x_map in df.columns:
+            df = df.rename(columns={x_map: x_std})
+        if y_map and y_map in df.columns:
+            df = df.rename(columns={y_map: y_std})
+
+        df["database"] = db_key
+        frames.append(df[[x_std, y_std, "database"]])
+
+    return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
+
+def fallback_table(df: pd.DataFrame) -> go.Figure:
+    return go.Figure(data=[go.Table(
+        header=dict(values=list(df.columns)),
+        cells=dict(values=[df[col] for col in df.columns])
+    )])
+
+def plot_charts_from_config(df: pd.DataFrame, chart_config: Dict[str, Any]) -> List[Any]:
+    figs: List[Any] = []
+
+    # ✅ Fallback if `charts` not explicitly provided
+    charts = chart_config.get("charts")
+    if not charts:
+        charts = [{"chart_type": chart_config.get("chart_type", "bar")}]
+
+    for chart in charts:
+        chart_type = chart.get("chart_type", "bar").lower().replace(" ", "_")
+        plot_fn = getattr(px, chart_type, None)
+
+        kwargs = {
+            "x": chart_config["x_axis"]["standard"],
+            "y": chart_config["y_axis"]["standard"],
+            "color": chart_config.get("group_by", "database")
+        }
+
+        if callable(plot_fn):
+            try:
+                fig = plot_fn(df, **kwargs)
+            except Exception as e:
+                print(f"⚠️ Plot failed: {e}")
+                fig = fallback_table(df)
+        else:
+            fig = fallback_table(df)
+
+        figs.append(fig)
+
+    return figs
+
+# -----------------------------
+# Main Execution
+# -----------------------------
+if __name__ == "__main__":
+    sql_by_db = {
+        "eon": "SELECT product_name, SUM(quantity) AS total_qty FROM orders GROUP BY product_name;",
+        "swift": "SELECT name, COUNT(order_id) FROM items JOIN orders ON items.item_id = orders.item_id GROUP BY name;"
+    }
+
+    all_results = [
+        {
+            "db": "eon",
+            "results": [
+                {"product_name": "Printer", "total_qty": 20},
+                {"product_name": "Scanner", "total_qty": 15},
+                {"product_name": "Monitor", "total_qty": 30}
+            ]
+        },
+        {
+            "db": "swift",
+            "results": [
+                {"name": "printer", "COUNT(order_id)": 25},
+                {"name": "scanner", "COUNT(order_id)": 18},
+                {"name": "Monitor", "COUNT(order_id)": 22}
+            ]
+        }
+    ]
+
+    question = "Compare total orders of products from Eon and Swift"
+    chart_config = generate_chart_suggestions(question, sql_by_db)
+
+    merged_df = normalize_and_merge_results(all_results, chart_config)
+    print("✅ Merged DataFrame:")
+    print(merged_df)
+    print("chart config",json.dumps(chart_config,indent=2))
+
+    figures = plot_charts_from_config(merged_df, chart_config)
+    if figures:
+        figures[0].show()
+    else:
+        print("No chart was generated")
+
+
+
+
+
+
+{
+    "error": "\"['total_orders'] not in index\""
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+------------------------
+----------------------
 PS C:\Users\AD54619\Text2Sql\gemini\multidb> python testchart.py
 ✅ Merged DataFrame:
   product_name  total_orders database
