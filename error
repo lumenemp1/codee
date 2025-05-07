@@ -1,3 +1,74 @@
+input
+
+{
+   "question":"orders according to country",
+   "selected_dbs":["eon","swift"]
+}
+
+output 
+
+{
+    "charts": ["{\"data\":[{\"hovertemplate\":\"country=%{x}\<br\>order_count=%{y}\<extra\>\<\/extra\>\",\"legendgroup\":\"\",\"marker\":{\"color\":\"#636efa\",\"pattern\":{\"shape\":\"\"}},\"name\":\"\",\"orientation\":\"v\",\"showlegend\":false,\"textposition\":\"auto\",\"x\":[\"Australia\",\"Germany\",\"Singap........]
+],
+    "db_results": {
+        "eon": [
+            {
+                "order_count": 1,
+                "shipping_country": "Australia"
+            },
+            {
+                "order_count": 1,
+                "shipping_country": "Germany"
+            },
+            {
+                "order_count": 1,
+                "shipping_country": "Singapore"
+            },
+            {
+                "order_count": 1,
+                "shipping_country": "Sweden"
+            },
+            {
+                "order_count": 2,
+                "shipping_country": "UK"
+            },
+            {
+                "order_count": 4,
+                "shipping_country": "USA"
+            }
+        ],
+        "swift": [
+            {
+                "country": " Springfield",
+                "order_count": 15
+            }
+        ]
+    },
+    "sql_queries": {
+        "eon": "SELECT\n  o.shipping_country,\n  COUNT(o.order_id) AS order_count\nFROM Orders AS o\nGROUP BY\n  o.shipping_country\nORDER BY\n  o.shipping_country;",
+        "swift": "SELECT\n    SUBSTRING_INDEX(address, ',', -1) AS country,\n    COUNT(order_id) AS order_count\nFROM\n    orders o\nJOIN\n    customers c ON o.customer_id = c.customer_id\nGROUP BY\n    country\nORDER BY\n    order_count DESC;"
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def normalize_and_merge_results(all_results: List[Dict[str, Any]], chart_mapping: Dict[str, Any]) -> pd.DataFrame:
     frames = []
     for result in all_results:
