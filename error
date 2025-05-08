@@ -1,3 +1,307 @@
+
+
+
+
+
+
+
+
+
+
+import React, { useState, useEffect } from "react";
+import SQLAccordion from "./SQLAccordion";
+import ResultAccordion from "./ResultAccordion";
+import ChartAccordion from "./ChartAccordion";
+import { BarChart2, Table, Code } from "lucide-react";
+
+export default function ChatMessage({ question, selectedDBs, response, loading }) {
+  const [activeTab, setActiveTab] = useState("results"); // "none", "results", "charts"
+  const [showSqlQueries, setShowSqlQueries] = useState(false);
+  const [activeResultTab, setActiveResultTab] = useState(""); // Track the active DB tab within ResultAccordion
+
+  // Debug logging of response structure when it changes
+  useEffect(() => {
+    if (response) {
+      console.log("Response structure:", {
+        hasDbResults: !!response.db_results,
+        hasSqlQueries: !!response.sql_queries,
+        dbResultsKeys: response.db_results ? Object.keys(response.db_results) : [],
+        sqlQueriesKeys: response.sql_queries ? Object.keys(response.sql_queries) : []
+      });
+    }
+  }, [response]);
+
+  // Debug when activeResultTab changes
+  useEffect(() => {
+    if (activeResultTab) {
+      console.log("Active result tab changed to:", activeResultTab);
+      
+      // Check if SQL query exists for this tab
+      if (response?.sql_queries) {
+        console.log(`SQL query for ${activeResultTab} exists:`, !!response.sql_queries[activeResultTab]);
+        if (response.sql_queries[activeResultTab]) {
+          console.log("SQL query sample:", response.sql_queries[activeResultTab].substring(0, 50) + "...");
+        } else {
+          console.log("SQL query not found for this database");
+        }
+      }
+    }
+  }, [activeResultTab, response?.sql_queries]);
+
+  const toggleTab = (tab) => {
+    setActiveTab(activeTab === tab ? "none" : tab);
+    // Hide SQL queries when changing tabs
+    setShowSqlQueries(false);
+  };
+
+  const toggleSqlQueries = () => {
+    console.log("Toggle SQL queries. Current state:", !showSqlQueries);
+    console.log("Active result tab:", activeResultTab);
+    setShowSqlQueries(!showSqlQueries);
+  };
+
+  // This function will be passed to ResultAccordion to track which DB tab is active
+  const handleResultTabChange = (dbName) => {
+    console.log("Result tab changed to:", dbName);
+    setActiveResultTab(dbName);
+  };
+
+  // Prepare SQL queries for the active DB only
+  const getActiveDbQueries = () => {
+    console.log("getActiveDbQueries called");
+    console.log("SQL queries:", response?.sql_queries);
+    console.log("Active result tab:", activeResultTab);
+    
+    if (!response?.sql_queries) {
+      console.log("No SQL queries available in response");
+      return {};
+    }
+    
+    if (!activeResultTab) {
+      console.log("No active result tab selected");
+      return {};
+    }
+    
+    // Check if the response structure is different than expected
+    if (typeof response.sql_queries !== 'object') {
+      console.log("SQL queries has unexpected format:", typeof response.sql_queries);
+      return {};
+    }
+    
+    // Check if the query for active DB exists
+    if (!response.sql_queries[activeResultTab]) {
+      console.log(`SQL query for ${activeResultTab} not found in:`, Object.keys(response.sql_queries));
+      
+      // Try case-insensitive matching
+      const matchingKey = Object.keys(response.sql_queries).find(
+        key => key.toLowerCase() === activeResultTab.toLowerCase()
+      );
+      
+      if (matchingKey) {
+        console.log(`Found matching key with different case: ${matchingKey}`);
+        const result = { [activeResultTab]: response.sql_queries[matchingKey] };
+        console.log("SQL query found:", result);
+        return result;
+      }
+      
+      return {};
+    }
+    
+    // Create an object with only the active DB's query
+    const result = { [activeResultTab]: response.sql_queries[activeResultTab] };
+    console.log("SQL query for active tab:", result);
+    return result;
+  };
+
+  // Set initial activeResultTab when response changes
+  useEffect(() => {
+    if (response?.db_results && Object.keys(response.db_results).length > 0 && !activeResultTab) {
+      const firstDbKey = Object.keys(response.db_results)[0];
+      console.log("Setting initial active result tab:", firstDbKey);
+      setActiveResultTab(firstDbKey);
+    }
+  }, [response?.db_results, activeResultTab]);
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden max-w-5xl mx-auto">
+      {/* User Question Section */}
+      <div className="p-5 md:p-6 bg-gray-50">
+        <div className="flex items-center mb-3">
+          <div className="bg-blue-500 text-white p-1 rounded-full w-7 h-7 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <div className="text-base font-medium text-gray-500 ml-3">You asked:</div>
+        </div>
+        <div className="text-lg font-medium text-gray-800">{question}</div>
+        {selectedDBs && selectedDBs.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {selectedDBs.map((db, index) => (
+              <span key={index} className="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+                {db}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Response Section */}
+      <div className="px-5 pt-3 pb-5 md:px-6 md:pt-0 md:pb-6">
+        {/* Loading State */}
+        {loading ? (
+          <div className="flex items-center space-x-3 py-5">
+            <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
+            <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+            <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></div>
+            <span className="text-lg text-gray-600 ml-2">Processing your question...</span>
+          </div>
+        ) : (
+          /* Response content */
+          <>
+            {response ? (
+              <>
+                {response.answer && (
+                  <div className="text-gray-800 mb-5 leading-relaxed text-lg">
+                    <div className="flex items-center mb-3">
+                      <div className="bg-indigo-500 text-white p-1 rounded-full w-7 h-7 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="text-base font-medium text-gray-500 ml-3">Answer:</div>
+                    </div>
+                    {response.answer}
+                  </div>
+                )}
+
+                {/* Tabs and Code Icon */}
+                {(response.db_results || response.charts || response.sql_queries) && (
+                  <div className="mt-6">
+                    <div className="flex items-center border-b">
+                      <div className="flex-1 flex">
+                        {response.db_results && (
+                          <button
+                            onClick={() => toggleTab("results")}
+                            className={`flex items-center py-3 px-5 text-lg font-medium ${
+                              activeTab === "results"
+                                ? "text-blue-600 border-b-2 border-blue-600"
+                                : "text-gray-500 hover:text-gray-700"
+                            }`}
+                          >
+                            <Table className="h-6 w-6 mr-2" />
+                            Result Tables
+                          </button>
+                        )}
+                        {response.charts && (
+                          <button
+                            onClick={() => toggleTab("charts")}
+                            className={`flex items-center py-3 px-5 text-lg font-medium ${
+                              activeTab === "charts"
+                                ? "text-blue-600 border-b-2 border-blue-600"
+                                : "text-gray-500 hover:text-gray-700"
+                            }`}
+                          >
+                            <BarChart2 className="h-6 w-6 mr-2" />
+                            Charts
+                          </button>
+                        )}
+                      </div>
+                      
+                      {/* Code Icon for SQL Queries - Only shown when results tab is active */}
+                      {response.sql_queries && activeTab === "results" && (
+                        <button
+                          onClick={toggleSqlQueries}
+                          className={`mr-3 p-2 rounded-lg flex items-center ${
+                            showSqlQueries ? "bg-blue-100 text-blue-700" : "text-gray-500 hover:bg-gray-100"
+                          }`}
+                          title={showSqlQueries ? "View Results" : "View SQL Query"}
+                        >
+                          <Code className="h-6 w-6" />
+                          <span className="ml-1 text-sm">{showSqlQueries ? "Results" : "SQL"}</span>
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Tab Content with Flip Animation */}
+                    <div className="mt-5 relative">
+                      {activeTab === "results" && response.db_results && (
+                        <>
+                          {/* Results View - shown when SQL is not displayed */}
+                          <div 
+                            className={`transition-all duration-300 ${
+                              showSqlQueries ? 'opacity-0 absolute' : 'opacity-100'
+                            }`}
+                          >
+                            <ResultAccordion 
+                              dbResults={response.db_results} 
+                              onTabChange={handleResultTabChange} 
+                            />
+                          </div>
+                          
+                          {/* SQL Query View - shown when toggled */}
+                          {response.sql_queries && (
+                            <div 
+                              className={`transition-all duration-300 ${
+                                showSqlQueries ? 'opacity-100' : 'opacity-0 absolute'
+                              }`}
+                            >
+                              <div className="animate-fadeIn bg-gray-50 rounded-xl p-4 border border-gray-200">
+                                <h3 className="text-lg font-medium text-gray-700 mb-3">
+                                  SQL Query for {activeResultTab.toUpperCase()}
+                                </h3>
+                                <SQLAccordion sqlQueries={getActiveDbQueries()} />
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      )}
+                      
+                      {activeTab === "charts" && response.charts && (
+                        <div className="animate-fadeIn">
+                          <ChartAccordion charts={response.charts} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Error message */}
+                {response.error && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 px-5 py-4 rounded-xl mt-5 flex items-center text-base">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    <span>{response.error}</span>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="text-gray-500 text-lg">Waiting for response...</div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 char_config{'chart_type': 'time_series', 'x_axis': {'standard': 'order_date', 'eon': 'order_date', 'swift': 'order_timestamp', 'pipeline': 'order_placed_timestamp'}, 'y_axis': {'standard': 'order_count', 'eon': 'order_id', 'swift': 'sales_order_id', 'pipeline': 'order_id'}, 'filters': {'date_range': 'last_three_months'}, 'database': {'eon': 'eon', 'swift': 'swift', 'pipeline': 'pipeline'}, 'count_distinct': True}
 
 
