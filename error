@@ -1,3 +1,21 @@
+char_config{'chart_type': 'time_series', 'x_axis': {'standard': 'order_date', 'eon': 'order_date', 'swift': 'order_timestamp', 'pipeline': 'order_placed_timestamp'}, 'y_axis': {'standard': 'order_count', 'eon': 'order_id', 'swift': 'sales_order_id', 'pipeline': 'order_id'}, 'filters': {'date_range': 'last_three_months'}, 'database': {'eon': 'eon', 'swift': 'swift', 'pipeline': 'pipeline'}, 'count_distinct': True}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 i want to use lucide-react icons and add it next to 
 sql query 
 results 
