@@ -1,3 +1,232 @@
+sql_by_db {'eon': 'SELECT COUNT(*) AS total_orders\nFROM orders\nWHERE YEAR(order_date) = 2024;', 'swift': 'SELECT COUNT(*) AS total_orders\nFROM sales_orders\nWHERE YEAR(order_timestamp) = 2024;', 'pipeline': 'SELECT COUNT(*) AS total_orders\nFROM order_records\nWHERE YEAR(order_placed_timestamp) = 2024;'}
+all results[{'db': 'eon', 'sql': 'SELECT COUNT(*) AS total_orders\nFROM orders\nWHERE YEAR(order_date) = 2024;', 'results': [{'total_orders': 30}]}, {'db': 'swift', 'sql': 'SELECT COUNT(*) AS total_orders\nFROM sales_orders\nWHERE YEAR(order_timestamp) = 2024;', 'results': [{'total_orders': 31}]}, {'db': 'pipeline', 'sql': 'SELECT COUNT(*) AS total_orders\nFROM order_records\nWHERE YEAR(order_placed_timestamp) = 2024;', 'results': [{'total_orders': 27}]}]
+char_config{'chart_type': 'pie', 'labels': {'standard': 'database'}, 'values': {'standard': 'total_orders', 'eon': 'total_orders', 'swift': 'total_orders', 'pipeline': 'total_orders'}}
+merged_dfEmpty DataFrame
+Columns: []
+Index: []
+
+
+
+def generate_chart_suggestions(question: str, all_results: List[Dict[str, Any]]) -> Dict[str, Any]:
+    description_section = ""
+    for result in all_results:
+        db = result["db"]
+        rows = result["results"]
+        if not rows:
+            continue
+        sample_row = rows[0]
+        description_section += f"-- {db} columns: {list(sample_row.keys())}\n"
+
+    prompt = f"""
+You are a data visualization assistant helping unify result sets from multiple databases.
+
+The user question is:
+{question}
+
+Below are result columns returned from each database (not SQL):
+
+{description_section}
+
+Your tasks:
+1. Understand the semantic meaning of each column in each DB.
+2. Suggest the most appropriate chart type for the user question and the available columns.
+3. If each database returns a **single aggregated value** (like COUNT or SUM), suggest a **pie** or **donut** chart. In this case:
+   - Use `"labels"` as the database name (e.g., `"eon"`, `"swift"`).
+   - Use `"values"` as the actual aggregate column (e.g., `"total_orders"`).
+   - Example:
+     {{
+       "chart_type": "pie",
+       "labels": {{
+         "standard": "database"
+       }},
+       "values": {{
+         "standard": "total_orders",
+         "eon": "total_orders",
+         "swift": "COUNT(*)",
+         "pipeline": "COUNT(order_id)"
+       }}
+     }}
+4. If the results have **multiple rows per database** (like per-product, per-date), suggest a **bar**, **line**, or **scatter** chart:
+   - Provide `x_axis` and `y_axis` mappings for each DB.
+   - Example:
+     {{
+       "chart_type": "bar",
+       "x_axis": {{
+         "standard": "product",
+         "eon": "product_name",
+         "swift": "item"
+       }},
+       "y_axis": {{
+         "standard": "total_sales",
+         "eon": "order_qty",
+         "swift": "units_sold"
+       }},
+       "group_by": "database"
+     }}
+5. Do **not** use database names (like `"eon"` or `"swift"`) as column names. Use `"database"` as a virtual label only if needed.
+6. Always return your response in a valid JSON format matching one of the above examples.
+"""
+
+    # Send to Gemini
+    payload = {"contents": [{"parts": [{"text": prompt}]}]}
+    headers = {"Content-Type": "application/json"}
+    response = requests.post(GEMINI_URL, headers=headers, json=payload)
+    response.raise_for_status()
+    data = response.json()
+
+    # Extract model response
+    charts_json = None
+    try:
+        if "candidates" in data and data["candidates"]:
+            candidate = data["candidates"][0]
+            content = candidate.get("content")
+            if isinstance(content, dict) and "parts" in content:
+                charts_json = content["parts"][0].get("text", "")
+            elif isinstance(content, str):
+                charts_json = content
+    except Exception as e:
+        print("❌ Unexpected Gemini response structure.")
+        print(json.dumps(data, indent=2))
+        raise e
+
+    # Parse safely using regex
+    if charts_json:
+        try:
+            match = re.search(r"```json\s*(\{.*?\})\s*```", charts_json, re.DOTALL)
+            if match:
+                return json.loads(match.group(1))
+
+            fallback_match = re.search(r"(\{.*?\})", charts_json, re.DOTALL)
+            if fallback_match:
+                return json.loads(fallback_match.group(1))
+
+        except json.JSONDecodeError as e:
+            print("❌ Failed to parse chart config. Raw Gemini output:")
+            print(repr(charts_json))
+            raise e
+
+    print("⚠️ No valid chart configuration returned by Gemini.")
+    return {}
+
+# -----------------------------
+# Plotting Helpers
+# -----------------------------
+def normalize_and_merge_results(all_results: List[Dict[str, Any]], chart_mapping: Dict[str, Any]) -> pd.DataFrame:
+    frames = []
+    chart_type = chart_mapping.get("chart_type", "").lower()
+
+    # Identify required standard fields
+    if chart_type in {"pie", "donut"}:
+        label_std = chart_mapping.get("labels", {}).get("standard")
+        value_std = chart_mapping.get("values", {}).get("standard")
+        if not label_std or not value_std:
+            return pd.DataFrame()
+    else:
+        x_std = chart_mapping.get("x_axis", {}).get("standard")
+        y_std = chart_mapping.get("y_axis", {}).get("standard")
+        if not x_std or not y_std:
+            return pd.DataFrame()
+
+    for result in all_results:
+        db_key = result["db"]
+        rows = result["results"]
+        if not rows:
+            continue
+
+        df = pd.DataFrame(rows)
+
+        if chart_type in {"pie", "donut"}:
+            label_map = chart_mapping.get("labels", {}).get(db_key)
+            value_map = chart_mapping.get("values", {}).get(db_key)
+
+            if not label_map or label_map not in df.columns:
+                continue
+
+            df = df.rename(columns={label_map: label_std})
+            if not value_map or value_map not in df.columns:
+                df[value_std] = 1
+            else:
+                df = df.rename(columns={value_map: value_std})
+
+            df["database"] = db_key  # ✅ Added for consistency
+            frames.append(df[[label_std, value_std, "database"]])
+
+        else:
+            x_map = chart_mapping.get("x_axis", {}).get(db_key)
+            y_map = chart_mapping.get("y_axis", {}).get(db_key)
+
+            if not x_map or x_map not in df.columns:
+                continue
+
+            df = df.rename(columns={x_map: x_std})
+            if not y_map or y_map not in df.columns:
+                df[y_std] = 1
+            else:
+                df = df.rename(columns={y_map: y_std})
+
+            df["database"] = db_key
+            frames.append(df[[x_std, y_std, "database"]])
+
+    return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
+
+def fallback_table(df: pd.DataFrame) -> go.Figure:
+    return go.Figure(data=[go.Table(
+        header=dict(values=list(df.columns)),
+        cells=dict(values=[df[col] for col in df.columns])
+    )])
+
+def plot_charts_from_config(df: pd.DataFrame, chart_config: Dict[str, Any]) -> List[Any]:
+    figs = []
+    chart_type = chart_config.get("chart_type", "bar").lower()
+
+    if df.empty or not chart_type:
+        return [fallback_table(df)]
+
+    try:
+        if chart_type in {"bar", "line", "scatter", "area"}:
+            x = chart_config.get("x_axis", {}).get("standard")
+            y = chart_config.get("y_axis", {}).get("standard")
+            color = chart_config.get("group_by", "database")
+            if not x or not y:
+                return [fallback_table(df)]
+            plot_fn = getattr(px, chart_type, None)
+            if callable(plot_fn):
+                fig = plot_fn(df, x=x, y=y, color=color)
+            else:
+                fig = fallback_table(df)
+
+        elif chart_type in {"pie", "donut"}:
+            labels = chart_config.get("labels", {}).get("standard")
+            values = chart_config.get("values", {}).get("standard")
+            if not labels or not values:
+                return [fallback_table(df)]
+            fig = px.pie(df, names=labels, values=values, hole=0.4 if chart_type == "donut" else 0)
+
+        else:
+            fig = fallback_table(df)
+
+    except Exception as e:
+        print(f"⚠️ Failed to plot {chart_type}: {e}")
+        fig = fallback_table(df)
+
+    figs.append(fig)
+    return figs
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 sql_by_db {'eon': 'SELECT COUNT(*) AS total_orders\nFROM orders\nWHERE YEAR(order_date) = 2024;', 'swift': 'SELECT COUNT(*)\nFROM sales_orders\nWHERE YEAR(order_timestamp) = 2024;', 'pipeline': 'SELECT COUNT(order_id)\nFROM order_records\nWHERE YEAR(order_placed_timestamp) = 2024;'}        
 all results[{'db': 'eon', 'sql': 'SELECT COUNT(*) AS total_orders\nFROM orders\nWHERE YEAR(order_date) = 2024;', 'results': [{'total_orders': 30}]}, {'db': 'swift', 'sql': 'SELECT COUNT(*)\nFROM sales_orders\nWHERE YEAR(order_timestamp) = 2024;', 'results': [{'COUNT(*)': 31}]}, {'db': 'pipeline', 'sql': 'SELECT COUNT(order_id)\nFROM order_records\nWHERE YEAR(order_placed_timestamp) = 2024;', 'results': [{'COUNT(order_id)': 27}]}]
 char_config{'chart_type': 'bar', 'x_axis': {'standard': 'database', 'eon': 'eon', 'swift': 'swift', 'pipeline': 'pipeline'}, 'y_axis': {'standard': 'total_orders', 'eon': 'total_orders', 'swift': 'COUNT(*)', 'pipeline': 'COUNT(order_id)'}, 'group_by': 'database'}
