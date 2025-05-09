@@ -1,3 +1,54 @@
+worked
+
+char_config{'chart_type': 'bar', 'x_axis': {'standard': 'country', 'eon': 'country', 'swift': 'buyer_location', 'pipeline': 'client_country'}, 'y_axis': {'standard': 'total_orders', 'eon': 'total_orders', 'swift': 'total_orders', 'pipeline': 'total_orders'}, 'group_by': 'database'}
+merged_df    country  total_orders  database
+0    Canada             8  pipeline
+1   Germany             9  pipeline
+2     India            13  pipeline
+3        UK            14  pipeline
+4       USA             6  pipeline
+5    Canada             7     swift
+6   Germany            18     swift
+7     India             8     swift
+8        UK            10     swift
+9       USA             7     swift
+10    India             6       eon
+11       UK            12       eon
+12  Germany            11       eon
+13   Canada            12       eon
+14      USA             9       eon
+
+
+didnt work 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 char_config{'chart_type': 'bar', 'x_axis': {'standard': 'order_placed_timestamp', 'pipeline': 'order_placed_timestamp', 'swift': 'order_timestamp', 'eon': 'order_date'}, 'y_axis': {'standard': 'order_id', 'pipeline': 'order_id', 'swift': 'sales_order_id', 'eon': 'order_id'}, 'group_by': 'database'}
 merged_df   order_placed_timestamp  order_id  database
 0     2025-04-30 16:08:29        20  pipeline
