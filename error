@@ -1,3 +1,36 @@
+
+127.0.0.1 - - [09/May/2025 10:25:00] "OPTIONS /api/query HTTP/1.1" 200 -
+sql_by_db {'eon': 'SELECT COUNT(*) AS total_orders\nFROM orders\nWHERE YEAR(order_date) = 2024;', 'swift': 'SELECT COUNT(*) AS total_orders\nFROM sales_orders\nWHERE YEAR(order_timestamp) = 2024;', 'pipeline': 'SELECT COUNT(*) AS total_orders\nFROM order_records\nWHERE YEAR(order_placed_timestamp) = 2024;'}
+all results[{'db': 'eon', 'sql': 'SELECT COUNT(*) AS total_orders\nFROM orders\nWHERE YEAR(order_date) = 2024;', 'results': [{'total_orders': 30}]}, {'db': 'swift', 'sql': 'SELECT COUNT(*) AS total_orders\nFROM sales_orders\nWHERE YEAR(order_timestamp) = 2024;', 'results': [{'total_orders': 31}]}, {'db': 'pipeline', 'sql': 'SELECT COUNT(*) AS total_orders\nFROM order_records\nWHERE YEAR(order_placed_timestamp) = 2024;', 'results': [{'total_orders': 27}]}]
+char_config{'chart_type': 'pie', 'labels': {'standard': 'database'}, 'values': {'standard': 'total_orders', 'eon': 'total_orders', 'swift': 'total_orders', 'pipeline': 'total_orders'}}
+merged_df   database  total_orders  database
+0       eon            30       eon
+1     swift            31     swift
+2  pipeline            27  pipeline
+⚠️ Failed to plot pie: Expected unique column names, got:
+- 'database' 2 times
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 sql_by_db {'eon': 'SELECT COUNT(*) AS total_orders\nFROM orders\nWHERE YEAR(order_date) = 2024;', 'swift': 'SELECT COUNT(*) AS total_orders\nFROM sales_orders\nWHERE YEAR(order_timestamp) = 2024;', 'pipeline': 'SELECT COUNT(*) AS total_orders\nFROM order_records\nWHERE YEAR(order_placed_timestamp) = 2024;'}
 all results[{'db': 'eon', 'sql': 'SELECT COUNT(*) AS total_orders\nFROM orders\nWHERE YEAR(order_date) = 2024;', 'results': [{'total_orders': 30}]}, {'db': 'swift', 'sql': 'SELECT COUNT(*) AS total_orders\nFROM sales_orders\nWHERE YEAR(order_timestamp) = 2024;', 'results': [{'total_orders': 31}]}, {'db': 'pipeline', 'sql': 'SELECT COUNT(*) AS total_orders\nFROM order_records\nWHERE YEAR(order_placed_timestamp) = 2024;', 'results': [{'total_orders': 27}]}]
 char_config{'chart_type': 'pie', 'labels': {'standard': 'database'}, 'values': {'standard': 'total_orders', 'eon': 'total_orders', 'swift': 'total_orders', 'pipeline': 'total_orders'}}
