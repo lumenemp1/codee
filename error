@@ -1,3 +1,119 @@
+def plot_charts_from_config(df: pd.DataFrame, chart_config: Dict[str, Any]) -> List[Any]:
+    figs = []
+    chart_type = chart_config.get("chart_type", "bar").lower()
+
+    if df.empty or not chart_type:
+        return [fallback_table(df)]
+
+    try:
+        if chart_type in {"bar", "line", "scatter", "area"}:
+            x = chart_config.get("x_axis", {}).get("standard")
+            y = chart_config.get("y_axis", {}).get("standard")
+            color = chart_config.get("group_by", "database")
+            if not x or not y:
+                return [fallback_table(df)]
+            plot_fn = getattr(px, chart_type, None)
+            if callable(plot_fn):
+                fig = plot_fn(df, x=x, y=y, color=color)
+            else:
+                fig = fallback_table(df)
+
+        elif chart_type in {"pie", "donut"}:
+            labels = chart_config.get("labels", {}).get("standard")
+            values = chart_config.get("values", {}).get("standard")
+            if not labels or not values:
+                return [fallback_table(df)]
+            fig = px.pie(df, names=labels, values=values, hole=0.4 if chart_type == "donut" else 0)
+
+        else:
+            fig = fallback_table(df)
+
+    except Exception as e:
+        print(f"⚠️ Failed to plot {chart_type}: {e}")
+        fig = fallback_table(df)
+
+    figs.append(fig)
+    return figs
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 worked
 
 char_config{'chart_type': 'bar', 'x_axis': {'standard': 'country', 'eon': 'country', 'swift': 'buyer_location', 'pipeline': 'client_country'}, 'y_axis': {'standard': 'total_orders', 'eon': 'total_orders', 'swift': 'total_orders', 'pipeline': 'total_orders'}, 'group_by': 'database'}
