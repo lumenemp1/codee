@@ -1,3 +1,337 @@
+import os
+import json
+import re
+import requests
+from pymongo import MongoClient
+from pymongo.errors import ConnectionFailure, OperationFailure
+
+# --- Configuration ---
+# !! IMPORTANT !!
+# 1. Set your GEMINI_API_KEY below.
+# 2. Ensure your MongoDB IP is whitelisted if connecting to a cloud instance.
+
+DB_NAME = "sample_eon"  # As provided by the user
+DB_URI = "mongodb+srv://Athaluri:Thenika@cluster0.d5a4upt.mongodb.net/sample_eon?retryWrites=true&w=majority"  # As provided
+
+# Replace with your actual Gemini API Key
+GEMINI_API_KEY = ""  # e.g., "YOUR_GEMINI_API_KEY_HERE"
+
+# User-specified model, ensure this is a valid model you have access to.
+GEMINI_MODEL = "gemini-1.5-flash-latest" # Using a known working model, user can change if "gemini-2.0-flash" is correct for them.
+
+GEMINI_URL = (
+    f"https://generativelanguage.googleapis.com/v1beta/models/"
+    f"{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
+)
+
+# --- MongoDB Functions ---
+
+def connect_db(uri, db_name):
+    """Connects to MongoDB and returns the database object."""
+    try:
+        client = MongoClient(uri)
+        # The ismaster command is cheap and does not require auth.
+        # It's a good way to verify the connection.
+        client.admin.command('ismaster')
+        print("Successfully connected to MongoDB!")
+        return client[db_name]
+    except ConnectionFailure:
+        print("MongoDB connection failed. Please check your URI and network settings.")
+        return None
+    except Exception as e:
+        print(f"An error occurred during MongoDB connection: {e}")
+        return None
+
+def get_db_schema(db):
+    """
+    Fetches schema information from the database.
+    For each collection, it gets field names and their Python types from a sample document.
+    """
+    schema_info = {}
+    if db is None: # Check if db object is None
+        print("Database object is None, cannot fetch schema.")
+        return json.dumps(schema_info)
+
+    try:
+        collection_names = db.list_collection_names()
+    except OperationFailure as e:
+        print(f"Could not list collections. Ensure user has 'listCollections' permission. Error: {e}")
+        return json.dumps(schema_info) # Return empty schema on error
+        
+    print("\nFetching database schema...")
+    for collection_name in collection_names:
+        if collection_name.startswith("system."): # Skip system collections
+            continue
+        collection = db[collection_name]
+        try:
+            # Fetch one sample document to infer schema
+            # For capped collections or very large ones, consider sampling or other strategies
+            sample_doc = collection.find_one()
+            if sample_doc:
+                fields = {}
+                for key, value in sample_doc.items():
+                    fields[key] = type(value).__name__
+                schema_info[collection_name] = fields
+            else:
+                schema_info[collection_name] = "No documents found or collection is empty."
+        except Exception as e:
+            schema_info[collection_name] = f"Could not retrieve sample document: {e}"
+            print(f"Warning: Could not retrieve sample document for collection {collection_name}: {e}")
+
+    print("Schema fetched successfully.")
+    return json.dumps(schema_info, indent=2)
+
+# --- Gemini API Functions ---
+
+def generate_mongo_query_with_gemini(schema_str, user_question):
+    """
+    Sends the schema and user question to Gemini API to get a MongoDB query.
+    """
+    if not GEMINI_API_KEY:
+        print("Error: GEMINI_API_KEY is not set. Please set it in the script.")
+        return None, None, None
+
+    headers = {"Content-Type": "application/json"}
+    prompt = f"""You are an expert MongoDB query generator.
+Based on the following database schema and the user's question, generate a JSON object.
+This JSON object must contain:
+1.  "collection": A string representing the target MongoDB collection name. This collection MUST exist in the schema provided.
+2.  "filter": A JSON object representing the filter for the MongoDB find() method. This should be a valid MongoDB query filter.
+3.  "projection": A JSON object representing the projection for the MongoDB find() method. If no specific projection is needed, this can be an empty object {{}} or null.
+
+Return ONLY this single JSON object. Do not include any explanations, comments, markdown backticks (like ```json), or any text other than the JSON object.
+
+Database Schema (field names and their inferred BSON types):
+{schema_str}
+
+User Question:
+{user_question}
+
+JSON Output:
+"""
+
+    payload = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {
+            "temperature": 0.2, # Lower temperature for more deterministic query generation
+            "topP": 0.8,
+            "topK": 40
+        }
+    }
+
+    print("\nAsking Gemini to generate the MongoDB query...")
+    try:
+        response = requests.post(GEMINI_URL, headers=headers, json=payload, timeout=60)
+        response.raise_for_status()  # Raises an HTTPError for bad responses (4XX or 5XX)
+
+        response_data = response.json()
+        
+        if 'candidates' not in response_data or not response_data['candidates']:
+            print("Error: Gemini API response did not contain 'candidates'.")
+            if 'promptFeedback' in response_data:
+                 print(f"Prompt Feedback: {response_data['promptFeedback']}")
+            return None, None, None # Return three None values as expected by the caller
+        
+        raw_response_text = response_data['candidates'][0]['content']['parts'][0]['text']
+        
+        # Clean the response: remove markdown backticks if present
+        # Gemini sometimes wraps JSON in ```json ... ```
+        match = re.search(r"```json\s*([\s\S]*?)\s*```", raw_response_text, re.IGNORECASE)
+        if match:
+            cleaned_response_text = match.group(1)
+        else:
+            cleaned_response_text = raw_response_text.strip()
+        
+        # Attempt to parse the cleaned JSON
+        query_data = json.loads(cleaned_response_text)
+        
+        collection_name = query_data.get("collection")
+        mongo_filter = query_data.get("filter", {}) # Default to empty filter
+        mongo_projection = query_data.get("projection") # Can be None or {}
+
+        if not collection_name:
+            print("Error: Gemini did not specify a target collection in its response.")
+            print(f"Gemini's raw response: {raw_response_text}")
+            return None, None, None # Return three None values
+        
+        # Validate if filter and projection are dicts (or None for projection)
+        if not isinstance(mongo_filter, dict):
+            print(f"Error: Gemini's 'filter' is not a valid dictionary. Got: {mongo_filter}")
+            return None, None, None # Return three None values
+        if mongo_projection is not None and not isinstance(mongo_projection, dict):
+            print(f"Error: Gemini's 'projection' is not a valid dictionary or null. Got: {mongo_projection}")
+            return None, None, None # Return three None values
+            
+        return collection_name, mongo_filter, mongo_projection
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error calling Gemini API: {e}")
+        if hasattr(e, 'response') and e.response is not None:
+            print(f"Response status: {e.response.status_code}")
+            try:
+                print(f"Response content: {e.response.json()}")
+            except json.JSONDecodeError:
+                print(f"Response content: {e.response.text}")
+        return None, None, None # Return three None values
+    except json.JSONDecodeError:
+        print(f"Error: Could not parse JSON response from Gemini. This may be due to an invalid format or an error message from the API.")
+        print(f"Cleaned Gemini response was:\n{cleaned_response_text}") # Use cleaned_response_text here
+        return None, None, None # Return three None values
+    except KeyError as e:
+        print(f"Error: Unexpected response structure from Gemini. Missing key: {e}")
+        print(f"Gemini's raw response: {raw_response_text}") # Use raw_response_text here
+        return None, None, None # Return three None values
+    except Exception as e:
+        print(f"An unexpected error occurred while processing Gemini response: {e}")
+        if 'raw_response_text' in locals(): # Check if raw_response_text is defined
+             print(f"Gemini's raw response: {raw_response_text}")
+        return None, None, None # Return three None values
+
+# --- Query Execution ---
+
+def execute_mongo_query(db, collection_name, mongo_filter, mongo_projection):
+    """Executes the MongoDB query and returns the results."""
+    if db is None: # Check if db object is None
+        print("Database not connected.")
+        return []
+    
+    try:
+        collection = db[collection_name]
+        
+        print(f"\nExecuting query on collection '{collection_name}':")
+        print(f"  Filter: {json.dumps(mongo_filter, indent=2)}")
+        if mongo_projection is not None: # Could be an empty dict {}
+            print(f"  Projection: {json.dumps(mongo_projection, indent=2)}")
+        
+        # pymongo expects None for no projection, or a dict for specific fields.
+        # An empty dict {} for projection means return all fields (default behavior for _id).
+        if mongo_projection is None or mongo_projection == {}: # Treat empty dict as no specific projection for simplicity here
+            cursor = collection.find(mongo_filter)
+        else:
+            cursor = collection.find(mongo_filter, mongo_projection)
+        
+        results = list(cursor) # Execute query and get all results
+        return results
+    except OperationFailure as e:
+        print(f"MongoDB operation failed: {e}")
+        print("This could be due to an invalid query generated by the LLM or permission issues.")
+        return []
+    except Exception as e:
+        print(f"An error occurred during query execution: {e}")
+        return []
+
+# --- Main CLI Interaction ---
+
+def main():
+    """Main function to run the CLI chatbot."""
+    print("Welcome to the MongoDB Natural Language Query Chatbot!")
+
+    if not GEMINI_API_KEY:
+        print("\nCRITICAL ERROR: GEMINI_API_KEY is not set in the script.")
+        print("Please open the script, find the GEMINI_API_KEY variable, and set your API key.")
+        return
+
+    # Update GEMINI_URL with the potentially updated API key (if it was set dynamically)
+    # Ensure this global variable is correctly referenced if it's modified elsewhere or needs to be.
+    global GEMINI_URL 
+    GEMINI_URL = (
+        f"[https://generativelanguage.googleapis.com/v1beta/models/](https://generativelanguage.googleapis.com/v1beta/models/)" # Corrected URL string
+        f"{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
+    )
+
+
+    db = connect_db(DB_URI, DB_NAME)
+    if db is None: # CORRECTED: Check if db is None
+        print("Failed to connect to the database. Exiting.")
+        return
+
+    schema_json_str = get_db_schema(db)
+    # Check if the schema string is empty or just "{}".
+    # json.loads will raise an error if schema_json_str is just an empty string.
+    try:
+        parsed_schema = json.loads(schema_json_str)
+        if not parsed_schema: # Check if the parsed schema dictionary is empty
+            print("Could not fetch schema or database is empty. Cannot proceed.")
+            return
+    except json.JSONDecodeError:
+        print("Error parsing the fetched schema. Cannot proceed.")
+        return
+        
+    print("\nDatabase Schema for reference:")
+    print(schema_json_str)
+
+    while True:
+        user_question = input("\nEnter your question about the database (or type 'exit' to quit): \n> ")
+        if user_question.lower() == 'exit':
+            print("Exiting chatbot. Goodbye!")
+            break
+        if not user_question.strip():
+            continue
+
+        collection_name, mongo_filter, mongo_projection = generate_mongo_query_with_gemini(schema_json_str, user_question)
+
+        if collection_name and mongo_filter is not None: # mongo_filter can be {}
+            # Verify collection_name exists in schema
+            current_schema = json.loads(schema_json_str) # Reload or use parsed_schema
+            if collection_name not in current_schema:
+                print(f"\nError: Gemini suggested collection '{collection_name}' which is not in the known schema.")
+                print("Known collections are:", ", ".join(current_schema.keys()))
+                continue
+
+            results = execute_mongo_query(db, collection_name, mongo_filter, mongo_projection)
+            
+            if results:
+                print(f"\nFound {len(results)} result(s):")
+                for i, doc in enumerate(results):
+                    # Basic pretty print, convert ObjectId to str for json.dumps
+                    try:
+                        print(f"--- Document {i+1} ---")
+                        print(json.dumps(doc, indent=2, default=str)) 
+                    except TypeError as te:
+                        print(f"Error displaying document (possibly due to unhandled BSON types): {doc}, Error: {te}")
+
+            else:
+                print("\nNo results found for your query or an error occurred during execution.")
+        else:
+            print("\nCould not generate or parse a valid MongoDB query from your question.")
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def plot_charts_from_config(df: pd.DataFrame, chart_config: Dict[str, Any]) -> List[Any]:
     figs = []
     chart_type = chart_config.get("chart_type", "bar").lower()
