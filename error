@@ -1,3 +1,20 @@
+
+sql_by_db {'eon': 'SELECT *\nFROM orders\nWHERE order_date < DATE_SUB(CURDATE(), INTERVAL 3 MONTH);', 'swift': 'SELECT\n  sales_order_id\nFROM sales_orders\nWHERE\n  order_timestamp < DATE_SUB(CURDATE(), INTERVAL 3 MONTH);', 'pipeline': 'SELECT *\nFROM order_records\nWHERE order_placed_timestamp < DATE_SUB(CURDATE(), INTERVAL 3 MONTH);'}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 char_config{'chart_type': 'bar', 'x_axis': {'standard': 'order_id', 'eon': 'order_id', 'swift': 'sales_order_id', 'pipeline': 'order_id'}, 'y_axis': {'standard': 'order_count', 'eon': 'order_id', 'swift': 'sales_order_id', 'pipeline': 'order_id'}, 'filter': {'time_window': 'last_three_months', 'eon': 'order_date', 'swift': None, 'pipeline': 'order_placed_timestamp'}, 'group_by': 'database'}
 
 
