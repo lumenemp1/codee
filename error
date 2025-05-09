@@ -1,3 +1,34 @@
+char_config{'chart_type': 'bar', 'x_axis': {'standard': 'order_placed_timestamp', 'pipeline': 'order_placed_timestamp', 'swift': 'order_timestamp', 'eon': 'order_date'}, 'y_axis': {'standard': 'order_id', 'pipeline': 'order_id', 'swift': 'sales_order_id', 'eon': 'order_id'}, 'group_by': 'database'}
+merged_df   order_placed_timestamp  order_id  database
+0     2025-04-30 16:08:29        20  pipeline
+1     2025-03-08 16:08:29        32  pipeline
+2     2025-04-15 16:08:29        40  pipeline
+3     2025-03-27 16:08:29        45  pipeline
+4     2025-04-23 16:08:29        46  pipeline
+5     2025-02-19 16:19:52         9     swift
+6     2025-04-06 16:19:52        23     swift
+7     2025-02-23 16:19:52        25     swift
+8     2025-03-27 16:19:52        28     swift
+9     2025-03-01 16:19:52        43     swift
+10    2025-02-09 15:50:41         3       eon
+11    2025-03-20 15:50:41        18       eon
+12    2025-04-05 15:50:41        21       eon
+13    2025-04-18 15:50:41        24       eon
+14    2025-05-02 15:50:41        28       eon
+15    2025-04-28 15:50:41        29       eon
+16    2025-04-21 15:50:41        42       eon
+
+
+
+
+
+
+
+
+
+
+
+
 
 sql_by_db {'eon': 'SELECT *\nFROM orders\nWHERE order_date < DATE_SUB(CURDATE(), INTERVAL 3 MONTH);', 'swift': 'SELECT\n  sales_order_id\nFROM sales_orders\nWHERE\n  order_timestamp < DATE_SUB(CURDATE(), INTERVAL 3 MONTH);', 'pipeline': 'SELECT *\nFROM order_records\nWHERE order_placed_timestamp < DATE_SUB(CURDATE(), INTERVAL 3 MONTH);'}
 
