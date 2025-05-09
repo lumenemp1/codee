@@ -1,3 +1,18 @@
+char_config{'chart_type': 'bar', 'x_axis': {'standard': 'order_id', 'eon': 'order_id', 'swift': 'sales_order_id', 'pipeline': 'order_id'}, 'y_axis': {'standard': 'order_count', 'eon': 'order_id', 'swift': 'sales_order_id', 'pipeline': 'order_id'}, 'filter': {'time_window': 'last_three_months', 'eon': 'order_date', 'swift': None, 'pipeline': 'order_placed_timestamp'}, 'group_by': 'database'}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 127.0.0.1 - - [09/May/2025 10:25:00] "OPTIONS /api/query HTTP/1.1" 200 -
 sql_by_db {'eon': 'SELECT COUNT(*) AS total_orders\nFROM orders\nWHERE YEAR(order_date) = 2024;', 'swift': 'SELECT COUNT(*) AS total_orders\nFROM sales_orders\nWHERE YEAR(order_timestamp) = 2024;', 'pipeline': 'SELECT COUNT(*) AS total_orders\nFROM order_records\nWHERE YEAR(order_placed_timestamp) = 2024;'}
