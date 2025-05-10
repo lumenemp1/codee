@@ -1,3 +1,147 @@
+Business Case 
+Identify similar products for consolidation.​
+Detect low-selling or obsolete products for deprecation.​
+Optimize ordering platform consolidation based on demand and products​
+Introduction of new Product Bundles based on sales data.​
+By rationalizing product portfolios and eliminating redundant platforms, companies can achieve cost savings, improved inventory management, and higher profitability
+
+platform
+Multiple Platforms, Redundant Listings: Different regions use various ordering platforms with overlapping or duplicate products.​
+Inconsistent Pricing & Offerings: Products may be priced differently across platforms, affecting
+profitability.​
+High Inventory Costs Due to Unoptimized Selection: Low-selling products increase storage costs and operational complexity.​
+Lack of Data-Driven Insights for Consolidation: No clear strategy for rationalization or platform optimization.​
+
+​
+
+🔹 Phase 1: Data Collection (Sales history, product attributes, platform details). – In Progress​
+🔹 Phase 2: AI Model Development (Product similarity analysis, clustering, demand forecasting). – In progress​
+🔹 Phase 3: Rationalization Strategy (Product optimization rules, regional adjustments).​
+🔹 Phase 4: Ordering Platform Consolidation (Standardization & transition)​
+
+
+this is a Business case we have been given 
+i need to know more about this business case 
+
+i want to build a virtual assistance that fetches data from database and perform analysis according to 
+the user question 
+
+the analysis which can be done is mentioned in the business case itself 
+
+so i dont want any code right now , give me suggestions on how i can build this 
+
+shuld i use AI agents ?
+​
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import os
 import json
 import re
