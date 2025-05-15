@@ -1,3 +1,139 @@
+Step 3: Methodology for Categorization
+The best and most accurate method combines trend analysis (statistical) with clustering (machine learning) to categorize products. Here’s the approach:
+
+A. Trend Analysis (Statistical Method)
+Fit a Trend Model:
+For each product, fit a linear regression model to the sales time series, where the independent variable is time (day index: 1 to 365) and the dependent variable is daily sales.
+Extract the slope of the regression line:
+Positive slope → Potential growing product.
+Negative slope → Potential decaying product.
+Near-zero slope → Stable or potentially obsolete (needs further checks).
+Compute the R-squared value to assess the strength of the trend (high R-squared indicates a reliable trend).
+Threshold for Obsolete:
+Define a sales threshold (e.g., average daily sales < 1 unit or < 5% of the product’s peak sales in the last 90 days).
+If a product’s sales are below this threshold for a prolonged period (e.g., last 90–180 days), classify it as obsolete.
+Smoothing for Robustness:
+Use a moving average (e.g., 30-day) to smooth the sales data before fitting the trend model to reduce the impact of outliers or short-term fluctuations.
+B. Clustering (Machine Learning Method)
+To improve accuracy and handle complex patterns, apply clustering to group products based on sales behavior:
+
+Feature Extraction:
+For each product, compute features like:
+Slope of the sales trend (from linear regression).
+Average sales in the first half vs. second half of the year.
+Volatility (standard deviation of sales).
+Percentage of days with zero sales (for obsolescence).
+Total sales volume (to differentiate high vs. low performers).
+Clustering Algorithm:
+Use K-means clustering (or DBSCAN for handling outliers) with 3 clusters (corresponding to growing, decaying, obsolete).
+Standardize features (e.g., using z-scores) to ensure equal weighting.
+Run clustering and assign each product to a cluster.
+Cluster Interpretation:
+Analyze the centroid of each cluster to map them to categories:
+Cluster with high positive slope, high sales → Growing.
+Cluster with negative slope, moderate sales → Decaying.
+Cluster with low sales, high zero-sales days → Obsolete.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Business Case 
 Identify similar products for consolidation.​
 Detect low-selling or obsolete products for deprecation.​
