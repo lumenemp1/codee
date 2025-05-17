@@ -1,3 +1,20 @@
+
+{
+    "error": "Invalid argument provided to Gemini: 400 * GenerateContentRequest.contents[2].parts: contents.parts must not be empty.\n"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 C:\Users\AD54619\Text2Sql\analysis\improv_analysis\app.py:17: LangChainDeprecationWarning: The method `Chain.run` was deprecated in langchain 0.1.0 and will be removed in 1.0. Use :meth:`~invoke` instead.
   response = trend_agent.run(user_message)
 
