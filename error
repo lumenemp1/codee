@@ -1,3 +1,188 @@
+S C:\Users\AD54619\Text2Sql\analysis\agentic_analysis> python main.py
+👋 Welcome to the Gemini Assistant!
+You can ask about trend analysis, forecasting, product bundling, and more.
+Type 'exit' to quit.
+
+You: trend analysis
+
+🔍 Detecting intent...
+🔍 Detected intent: trend_analysis
+
+📊 Routing to Trend Analysis Agent...
+[DEBUG] TrendAnalysisAgent initialized with 6 tools
+[DEBUG] Added user message: trend analysis
+📈 Trend Analysis Agent: Hi! I can help you analyze sales trends.
+
+You: hi i want saled trend and growth analysis on product cap in eon
+[DEBUG] Added user message: hi i want saled trend and growth analysis on product cap in eon
+[DEBUG] Making API request to Gemini with 2 history items
+[DEBUG] Available tools: ['list_databases', 'validate_database', 'load_product_list', 'validate_product_name', 'get_monthly_sales', 'summarize_trend']
+[DEBUG] API Status Code: 200
+[DEBUG] Tool call result type: tool_call
+[DEBUG] Calling tool: get_monthly_sales with args: {'db_name': 'eon', 'product_name': 'cap'}
+[DEBUG] Getting monthly sales for cap in eon
+C:\Users\AD54619\Text2Sql\new_env\Lib\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+C:\Users\AD54619\Text2Sql\analysis\agentic_analysis\trend_analysis_tools.py:75: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  df_filtered["month"] = df_filtered["date"].dt.strftime("%B %Y")
+📊 Monthly Sales:
+   January 2024: 478
+   February 2024: 216
+   March 2024: 194
+   April 2024: 170
+   May 2024: 172
+   June 2024: 217
+   July 2024: 237
+   August 2024: 176
+   September 2024: 201
+   October 2024: 194
+   November 2024: 168
+   December 2024: 158
+   January 2025: 0
+[DEBUG] Added user message: Monthly sales data for 'cap': {"January 2024": 478, "February 2024": 216, "March 2024": 194, "April 2024": 170, "May 2024": 172, "June 2024": 217, "July 2024": 237, "August 2024": 176, "September 2024": 201, "October 2024": 194, "November 2024": 168, "December 2024": 158, "January 2025": 0}. Please summarize the trend.
+[DEBUG] Making API request to Gemini with 4 history items
+[DEBUG] Available tools: ['list_databases', 'validate_database', 'load_product_list', 'validate_product_name', 'get_monthly_sales', 'summarize_trend']
+[DEBUG] API Status Code: 200
+[DEBUG] gemnini responded with another tool call:summarize_trend({'monthly_sales': '{"January 2024": 478, "February 2024": 216, "March 2024": 194, "April 2024": 170, "May 2024": 172, "June 2024": 217, "July 2024": 237, "August 2024": 176, "September 2024": 201, "October 2024": 194, "November 2024": 168, "December 2024": 158, "January 2025": 0}', 'product_name': 'cap'})
+
+You:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 from gemini_chat_agent import GeminiChatAgent
 
 # ------------------ SIMPLIFIED TOOL SCHEMAS ------------------
