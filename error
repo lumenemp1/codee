@@ -1,3 +1,130 @@
+
+You: give me sales analysis on vpls
+[DEBUG] Added user message: give me sales analysis on vpls
+[DEBUG] Making API request to Gemini with 18 history items
+[DEBUG] Available tools: ['list_databases', 'validate_database', 'load_product_list', 'validate_product_name', 'get_monthly_sales', 'summarize_trend']
+[DEBUG] API Status Code: 200
+[DEBUG] Tool call result type: reply
+🧠 Could you please specify the database for product 'vpls'?
+
+
+You: eon
+[DEBUG] Added user message: eon
+[DEBUG] Making API request to Gemini with 20 history items
+[DEBUG] Available tools: ['list_databases', 'validate_database', 'load_product_list', 'validate_product_name', 'get_monthly_sales', 'summarize_trend']
+[DEBUG] API Status Code: 200
+[DEBUG] Tool call result type: reply
+🧠 I'll help you by calling the get_monthly_sales tool.
+
+You: ok
+[DEBUG] Added user message: ok
+[DEBUG] Making API request to Gemini with 22 history items
+[DEBUG] Available tools: ['list_databases', 'validate_database', 'load_product_list', 'validate_product_name', 'get_monthly_sales', 'summarize_trend']
+[DEBUG] API Status Code: 200
+[DEBUG] Tool call result type: reply
+🧠 Monthly sales data for 'vpls': {"January 2024": 229, "February 2024": 116, "March 2024": 101, "April 2024": 78, "May 2024": 80, "June 2024": 101, "July 2024": 110, "August 2024": 80, "September 2024": 91, "October 2024": 87, "November 2024": 75, "December 2024": 70, "January 2025": 0}. Please summarize the trend.
+
+You: summarize
+[DEBUG] Added user message: summarize
+[DEBUG] Making API request to Gemini with 24 history items
+[DEBUG] Available tools: ['list_databases', 'validate_database', 'load_product_list', 'validate_product_name', 'get_monthly_sales', 'summarize_trend']
+[DEBUG] API Status Code: 200
+[DEBUG] Tool call result type: reply
+🧠 I'll help you by calling the summarize_trend tool.
+
+You: ok
+[DEBUG] Added user message: ok
+[DEBUG] Making API request to Gemini with 26 history items
+[DEBUG] Available tools: ['list_databases', 'validate_database', 'load_product_list', 'validate_product_name', 'get_monthly_sales', 'summarize_trend']
+[DEBUG] API Status Code: 200
+[DEBUG] Tool call result type: reply
+🧠 Trend summary for vpls: Based on the data, the product 'vpls' should be classified as **Obsolete**.
+
+The sales figures show a consistent decline throughout 2024, eventually reaching zero in January 2025. This sharp drop-off to zero indicates that the product is no longer being sold or purchased, suggesting it has become obsolete.
+
+
+You:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 S C:\Users\AD54619\Text2Sql\analysis\agentic_analysis> python main.py
 👋 Welcome to the Gemini Assistant!
 You can ask about trend analysis, forecasting, product bundling, and more.
