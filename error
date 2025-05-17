@@ -1,4 +1,88 @@
 
+
+{
+
+   "message":"i want to do on eon db and product would be gcms"
+
+}
+
+> Entering new AgentExecutor chain...
+
+
+
+> Entering new AgentExecutor chain...
+
+
+
+Invoking: `validate_database` with `{'db_name': 'eon'}`
+
+
+
+
+
+Invoking: `validate_database` with `{'db_name': 'eon'}`
+
+
+
+Invoking: `validate_database` with `{'db_name': 'eon'}`
+
+
+
+
+
+{'status': 'valid', 'db_name': 'eon'}127.0.0.1 - - [18/May/2025 01:03:16] "POST /chat HTTP/1.1" 500 -
+
+
+
+
+
+> Entering new AgentExecutor chain...
+
+
+
+Invoking: `validate_database` with `{'db_name': 'eon'}`
+
+
+
+
+
+{'status': 'valid', 'db_name': 'eon'}127.0.0.1 - - [18/May/2025 01:12:51] "POST /chat HTTP/1.1" 500 -
+
+{
+
+    "error": "Invalid argument provided to Gemini: 400 * GenerateContentRequest.contents[2].parts: contents.parts must not be empty.\n"
+
+}
+
+
+
+after it validated the db name its not picking the product and validating the product is it so ???
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 {
     "error": "Invalid argument provided to Gemini: 400 * GenerateContentRequest.contents[2].parts: contents.parts must not be empty.\n"
 }
