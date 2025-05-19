@@ -1,3 +1,55 @@
+
+
+# ---------- Fourth Row: All Products Bar Chart ----------
+st.subheader("All Products Performance")
+all_products_df = df_filtered.groupby('product')['total_orders'].sum().reset_index()
+all_products_df = all_products_df.sort_values(by='total_orders', ascending=False)
+
+fig_all = go.Figure()
+fig_all.add_trace(go.Bar(
+    x=all_products_df['product'],
+    y=all_products_df['total_orders'],
+    marker_color='#4CAF50'  # Green color for all products
+))
+fig_all.update_layout(
+    margin=dict(l=0, r=0, t=20, b=0),
+    height=300,
+    xaxis=dict(showgrid=False),
+    yaxis=dict(
+        showgrid=True,
+        gridcolor='rgba(255,255,255,0.1)'
+    ),
+    plot_bgcolor='rgba(50,50,100,0.8)',
+    paper_bgcolor='rgba(50,50,100,0)',
+    font=dict(color='white')
+)
+
+st.plotly_chart(fig_all, use_container_width=True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Okay, here's a list of the chart colors and background colors used in your Streamlit script:
 
 **Chart Colors (for data visualization elements like bars and lines):**
