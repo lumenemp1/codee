@@ -1,6 +1,471 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+import numpy as np
+from scipy import stats
+from datetime import datetime, timedelta
+
+# Setup
+st.set_page_config(page_title="Product Sales Trend", layout="wide")
+st.title("📈 Product Sales Trend Dashboard")
+
+# Load and cache data
+@st.cache_data
+def load_data():
+    df = pd.read_excel("final.xlsx")
+    df['date'] = pd.to_datetime(df['date'])
+    return df
+
+df = load_data()
+
+# Initialize session state for selected product
+if 'selected_product' not in st.session_state:
+    st.session_state.selected_product = None
+
+# Define callback functions for buttons
+def select_product(product_name):
+    st.session_state.selected_product = product_name
+    
+def go_back_to_all():
+    st.session_state.selected_product = None
+
+# Helper to generate sparkline chart
+def generate_sparkline(data, color):
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=data['date'],
+        y=data['total_orders'],
+        mode='lines',
+        line=dict(color=color, width=2),
+        hoverinfo='skip'
+    ))
+    fig.update_layout(
+        margin=dict(l=0, r=0, t=0, b=0),
+        xaxis=dict(visible=False),
+        yaxis=dict(visible=False),
+        height=40
+    )
+    return fig
+
+# Main layout switch
+if st.session_state.selected_product is None:
+    st.subheader("All Product Trends (Sparklines)")
+    reference_date = df['date'].max()
+    preview_period = reference_date - timedelta(days=30)
+
+    # Filter
+    search_term = st.text_input("🔍 Search Product")
+
+    # Collect stats for sorting
+    trend_rows = []
+    for product in sorted(df['product'].unique()):
+        if search_term.lower() not in product.lower():
+            continue
+
+        product_data = df[df['product'] == product]
+        period_data = product_data[(product_data['date'] >= preview_period) & (product_data['date'] <= reference_date)].sort_values('date')
+
+        if period_data.empty:
+            continue
+
+        start_val = period_data.iloc[0]['total_orders']
+        end_val = period_data.iloc[-1]['total_orders']
+        delta = end_val - start_val
+        rate = (delta / start_val * 100) if start_val != 0 else 0
+        color = 'green' if delta >= 0 else 'red'
+        trend_icon = '⬆️' if delta >= 0 else '⬇️'
+
+        trend_rows.append({
+            'product': product,
+            'end_val': end_val,
+            'rate': rate,
+            'trend_icon': trend_icon,
+            'color': color,
+            'period_data': period_data
+        })
+
+    # Sort by highest growth
+    trend_rows = sorted(trend_rows, key=lambda x: x['rate'], reverse=True)
+
+    # Display in grid (3 per row)
+    for i in range(0, len(trend_rows), 3):
+        row = trend_rows[i:i+3]
+        cols = st.columns(3)
+        for col, item in zip(cols, row):
+            with col:
+                # Use on_click with the callback function instead of checking button state
+                st.button(f"{item['product']}", key=f"btn_{item['product']}", 
+                          on_click=select_product, args=(item['product'],))
+                st.markdown(f"**📦 Orders:** {int(item['end_val'])}")
+                st.markdown(f"**{item['trend_icon']} {item['rate']:.1f}%**")
+                st.plotly_chart(generate_sparkline(item['period_data'], item['color']), use_container_width=True, key=f"sparkline_{item['product']}")
+
+else:
+    selected_product = st.session_state.selected_product
+    st.subheader(f"📊 Detailed View: {selected_product}")
+    # Use on_click with the callback function
+    st.button("🔙 Back to All Products", on_click=go_back_to_all)
+
+    # Detailed chart view
+    time_ranges = {
+        "1 Week": timedelta(weeks=1),
+        "1 Month": timedelta(days=30),
+        "1 Year": timedelta(days=365),
+        "2 Years": timedelta(days=730)
+    }
+
+    reference_date = df['date'].max()
+    product_data = df[df['product'] == selected_product]
+
+    tabs = st.tabs(list(time_ranges.keys()))
+
+    for i, (label, delta) in enumerate(time_ranges.items()):
+        with tabs[i]:
+            start_date = reference_date - delta
+            period_data = product_data[(product_data['date'] >= start_date) & (product_data['date'] <= reference_date)].sort_values('date')
+
+            if not period_data.empty:
+                # Calculate trend metrics using the entire dataset
+                total_sales = period_data['total_orders'].sum()
+                avg_sales = period_data['total_orders'].mean()
+                
+                # Calculate trend using linear regression
+                x = np.array(range(len(period_data)))
+                y = period_data['total_orders'].values
+                
+                # Display more comprehensive metrics
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.metric(label="Total Sales", value=f"{int(total_sales)}")
+                
+                with col2:
+                    st.metric(label="Average Daily Sales", value=f"{avg_sales:.1f}")
+                
+                with col3:
+                    # Calculate trend using linear regression if we have enough data points
+                    if len(x) > 1:
+                        slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
+                        # Normalize slope as percentage of average sales for the period
+                        normalized_slope = (slope / avg_sales * 100) if avg_sales > 0 else 0
+                        
+                        trend_description = ""
+                        if abs(normalized_slope) < 2:
+                            trend_description = "Stable"
+                        elif normalized_slope > 0:
+                            trend_description = "Upward" if normalized_slope > 10 else "Slight Upward"
+                        else:
+                            trend_description = "Downward" if normalized_slope < -10 else "Slight Downward"
+                            
+                        st.metric(label="Trend", 
+                                value=f"{trend_description}",
+                                delta=f"{normalized_slope:.1f}% per day", 
+                                delta_color="normal" if abs(normalized_slope) < 2 else ("inverse" if normalized_slope < 0 else "normal"))
+                        
+                        # Display R-squared value to indicate strength of trend
+                        st.caption(f"Trend reliability: {r_value**2:.2f} (R²)")
+                    else:
+                        st.metric(label="Trend", value="Insufficient Data")
+                
+                # Create trend visualization
+                fig = go.Figure()
+                
+                # Add actual data points
+                fig.add_trace(go.Scatter(
+                    x=period_data['date'],
+                    y=period_data['total_orders'],
+                    mode='lines+markers',
+                    name="Daily Orders",
+                    line=dict(color='royalblue', width=2),
+                    marker=dict(size=6),
+                ))
+                
+                # Add trend line if we have enough data
+                if len(x) > 1:
+                    # Generate trend line points
+                    trend_x = np.array(range(len(period_data)))
+                    trend_y = intercept + slope * trend_x
+                    
+                    # Convert trend_x back to dates for plotting
+                    trend_dates = period_data['date'].iloc[0] + pd.to_timedelta(trend_x, unit='D')
+                    
+                    # Add trend line
+                    fig.add_trace(go.Scatter(
+                        x=trend_dates,
+                        y=trend_y,
+                        mode='lines',
+                        name="Trend Line",
+                        line=dict(color='red' if slope < 0 else 'green', width=2, dash='dash'),
+                    ))
+                    
+                    # Show moving average (7-day) if we have enough data
+                    if len(period_data) >= 7:
+                        period_data['7d_avg'] = period_data['total_orders'].rolling(window=7, min_periods=1).mean()
+                        fig.add_trace(go.Scatter(
+                            x=period_data['date'],
+                            y=period_data['7d_avg'],
+                            mode='lines',
+                            name="7-Day Avg",
+                            line=dict(color='purple', width=2),
+                        ))
+
+                fig.update_layout(
+                    title=f"{selected_product.upper()} - {label} Analysis",
+                    xaxis_title="Date",
+                    yaxis_title="Orders",
+                    height=550,
+                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+                )
+                st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.warning("No data available for this period.")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import streamlit as st
+import pandas as pd
+import plotly.graph_objects as go
 from datetime import datetime, timedelta
 
 # Setup
