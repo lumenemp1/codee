@@ -1,3 +1,49 @@
+Okay, here's a list of the chart colors and background colors used in your Streamlit script:
+
+**Chart Colors (for data visualization elements like bars and lines):**
+
+* **`'#00BFFF'` (Deep Sky Blue):** Used for:
+    * Total Revenue line in the monthly revenue chart.
+    * Bars in the "Top Selling Products" chart.
+    * Bars in the "All Products by Sales Volume (Descending)" chart (when the "View All Top Products" button is clicked).
+* **`'#FFD700'` (Gold):** Used as one of the colors for individual product revenue lines in the "By product" monthly revenue chart.
+* **`'#FF69B4'` (Hot Pink):** Used as one of the colors for individual product revenue lines in the "By product" monthly revenue chart.
+* **`'#32CD32'` (Lime Green):** Used as one of the colors for individual product revenue lines in the "By product" monthly revenue chart.
+* **`'#FF6B6B'` (Salmon/Light Red):** Used for:
+    * Bars in the "Bottom Selling Products" chart.
+    * Bars in the "All Products by Sales Volume (Ascending)" chart (when the "View All Bottom Products" button is clicked).
+* **`'#4CAF50'` (Green):** Used for the bars in the "All Products Performance" chart.
+
+**Background Colors:**
+
+* **`'rgba(50,50,100,0.8)'` (Dark Blue/Purple with some transparency):** Used as the `plot_bgcolor` for all the Plotly charts (monthly revenue total, monthly revenue by product, top selling, bottom selling, and all products).
+* **`'rgba(50,50,100,0)'` (Transparent Dark Blue/Purple):** Used as the `paper_bgcolor` for all the Plotly charts, making the background of the chart itself transparent and showing the Streamlit app's background.
+* **`'rgba(255,255,255,0.1)'` (Very light gray with transparency):** Used as the `gridcolor` for the y-axes of the monthly revenue charts and the top/bottom/all products charts.
+
+This list should give you a clear overview of the colors being used in your dashboard.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
