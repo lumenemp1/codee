@@ -1,3 +1,200 @@
+
+────────────────────────── Traceback (most recent call last) ───────────────────────────
+  C:\Users\AD54619\Text2Sql\new_env\Lib\site-packages\streamlit\runtime\scriptrunner\e
+  xec_code.py:121 in exec_func_with_error_handling
+
+  C:\Users\AD54619\Text2Sql\new_env\Lib\site-packages\streamlit\runtime\scriptrunner\s
+  cript_runner.py:645 in code_to_exec
+
+  C:\Users\AD54619\Text2Sql\analysis\uptrend_downtrend.py:58 in <module>
+
+     55 │   │   │   if st.button(product):
+     56 │   │   │   │   st.session_state.selected_product = product
+     57 │   │   with cols[1]:
+  ❱  58 │   │   │   st.plotly_chart(generate_sparkline(period_data, color), use_contai
+     59 
+     60 else:
+     61 │   selected_product = st.session_state.selected_product
+
+  C:\Users\AD54619\Text2Sql\new_env\Lib\site-packages\streamlit\runtime\metrics_util.p
+  y:444 in wrapped_func
+
+  C:\Users\AD54619\Text2Sql\new_env\Lib\site-packages\streamlit\elements\plotly_chart.
+  py:509 in plotly_chart
+
+  C:\Users\AD54619\Text2Sql\new_env\Lib\site-packages\streamlit\elements\lib\utils.py:
+  239 in compute_and_register_element_id
+
+  C:\Users\AD54619\Text2Sql\new_env\Lib\site-packages\streamlit\elements\lib\utils.py:
+  145 in _register_element_id
+────────────────────────────────────────────────────────────────────────────────────────
+StreamlitDuplicateElementId: There are multiple `plotly_chart` elements with the same
+auto-generated ID. When this element is created, it is assigned an internal ID based on
+the element type and provided parameters. Multiple elements with the same type and
+parameters will cause this error.
+
+To fix this error, please pass a unique `key` argument to the `plotly_chart` element.
+────────────────────────── Traceback (most recent call last) ───────────────────────────
+  C:\Users\AD54619\Text2Sql\new_env\Lib\site-packages\streamlit\runtime\scriptrunner\e
+  xec_code.py:121 in exec_func_with_error_handling
+
+  C:\Users\AD54619\Text2Sql\new_env\Lib\site-packages\streamlit\runtime\scriptrunner\s
+  cript_runner.py:645 in code_to_exec
+
+  C:\Users\AD54619\Text2Sql\analysis\uptrend_downtrend.py:58 in <module>
+
+     55 │   │   │   if st.button(product):
+     56 │   │   │   │   st.session_state.selected_product = product
+     57 │   │   with cols[1]:
+  ❱  58 │   │   │   st.plotly_chart(generate_sparkline(period_data, color), use_contai
+     59 
+     60 else:
+     61 │   selected_product = st.session_state.selected_product
+
+  C:\Users\AD54619\Text2Sql\new_env\Lib\site-packages\streamlit\runtime\metrics_util.p
+  y:444 in wrapped_func
+
+  C:\Users\AD54619\Text2Sql\new_env\Lib\site-packages\streamlit\elements\plotly_chart.
+  py:509 in plotly_chart
+
+  C:\Users\AD54619\Text2Sql\new_env\Lib\site-packages\streamlit\elements\lib\utils.py:
+  239 in compute_and_register_element_id
+
+  C:\Users\AD54619\Text2Sql\new_env\Lib\site-packages\streamlit\elements\lib\utils.py:
+  145 in _register_element_id
+────────────────────────────────────────────────────────────────────────────────────────
+StreamlitDuplicateElementId: There are multiple `plotly_chart` elements with the same
+auto-generated ID. When this element is created, it is assigned an internal ID based on
+the element type and provided parameters. Multiple elements with the same type and
+parameters will cause this error.
+
+To fix this error, please pass a unique `key` argument to the `plotly_chart` element.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 For analyzing product sales trends over time with the dataset you have, **what you've done is a good starting point for a very basic overview, but you can definitely make improvements for a more accurate and insightful analysis.**
 
 Here's a breakdown of what's right and what improvements you can consider:
