@@ -1,3 +1,207 @@
+import React, { useState, useEffect } from "react";
+
+export default function ResultAccordion({ dbResults, onTabChange }) {
+  const dbNames = Object.keys(dbResults || {});
+  const [activeTab, setActiveTab] = useState(dbNames[0] || "");
+
+  // When this component mounts or when active tab changes, notify parent component
+  useEffect(() => {
+    if (activeTab && onTabChange) {
+      onTabChange(activeTab);
+    }
+  }, [activeTab, onTabChange]);
+
+  if (!dbNames.length) return <p className="text-sm text-gray-500">No results available.</p>;
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    if (onTabChange) {
+      onTabChange(tab);
+    }
+  };
+
+  return (
+    <div className="mt-2">
+      {/* Tabs */}
+      <div className="flex flex-wrap gap-2 mb-2">
+        {dbNames.map((db) => (
+          <button
+            key={db}
+            onClick={() => handleTabChange(db)}
+            className={`px-3 py-1 rounded-md text-sm border ${
+              activeTab === db ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-800"
+            }`}
+          >
+            {db.toUpperCase()}
+          </button>
+        ))}
+      </div>
+
+      {/* Table */}
+      <div className="overflow-x-auto border rounded-md">
+        <table className="min-w-full text-sm">
+          <thead className="bg-gray-100 text-gray-700">
+            <tr>
+              {Object.keys(dbResults[activeTab][0] || {}).map((col) => (
+                <th key={col} className="px-4 py-2 text-left border-b">
+                  {col}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {dbResults[activeTab].map((row, idx) => (
+              <tr key={idx} className="hover:bg-gray-50">
+                {Object.values(row).map((val, i) => (
+                  <td key={i} className="px-4 py-2 border-b">
+                    {val}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 return (
     <>
     {question?.trim() && (
