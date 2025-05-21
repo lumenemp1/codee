@@ -1,3 +1,385 @@
+return (
+    <>
+    {question?.trim() && (
+  <div className="flex justify-end">
+    <div className="bg-blue-600 text-white border border-blue-500 rounded-2xl shadow-sm overflow-hidden max-w-md ml-auto">
+      <div className="p-5 md:p-6">
+        <div className="text-lg font-medium">{question}</div>
+
+        {selectedDBs && selectedDBs.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {selectedDBs.map((db, index) => (
+              <span
+                key={index}
+                className="text-sm bg-white text-black px-3 py-1 rounded-full"
+              >
+                {db}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+)}
+    </>
+
+      {/* Bot Response Block */}
+      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="px-5 pt-5 pb-5 md:px-6 md:pt-6 md:pb-6">
+          {/* Loading State */}
+          {loading ? (
+            <div className="flex items-center space-x-3 py-5">
+              <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
+              <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+              <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></div>
+              <span className="text-lg text-gray-600 ml-2">Processing your question...</span>
+            </div>
+          ) : (
+            /* Response content */
+            <>
+              {response ? (
+                <>
+                  {response.answer && (
+                    <div className="text-gray-800 mb-5 leading-relaxed text-lg">
+                      <div className="flex items-center mb-3">
+                        <div className="bg-indigo-500 text-white p-1 rounded-full w-7 h-7 flex items-center justify-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <div className="text-base font-medium text-gray-500 ml-3">Answer:</div>
+                      </div>
+                      {response.answer}
+                    </div>
+                  )}
+
+                  {/* Tabs and Code Icon */}
+                  {(response.db_results || response.charts || response.sql_queries) && (
+                    <div className="mt-6">
+                      <div className="flex items-center border-b">
+                        <div className="flex-1 flex">
+                          {response.db_results && (
+                            <button
+                              onClick={() => toggleTab("results")}
+                              className={`flex items-center py-3 px-5 text-lg font-medium ${
+                                activeTab === "results"
+                                  ? "text-blue-600 border-b-2 border-blue-600"
+                                  : "text-gray-500 hover:text-gray-700"
+                              }`}
+                            >
+                              <Table className="h-6 w-6 mr-2" />
+                              Result Tables
+                            </button>
+                          )}
+                          {response.charts && (
+                            <button
+                              onClick={() => toggleTab("charts")}
+                              className={`flex items-center py-3 px-5 text-lg font-medium ${
+                                activeTab === "charts"
+                                  ? "text-blue-600 border-b-2 border-blue-600"
+                                  : "text-gray-500 hover:text-gray-700"
+                              }`}
+                            >
+                              <BarChart2 className="h-6 w-6 mr-2" />
+                              Charts
+                            </button>
+                          )}
+                        </div>
+                        
+                        {/* Code Icon for SQL Queries - Only shown when results tab is active */}
+                        {response.sql_queries && activeTab === "results" && (
+                          <button
+                            onClick={toggleSqlQueries}
+                            className={`mr-3 p-2 rounded-lg flex items-center ${
+                              showSqlQueries ? "bg-blue-100 text-blue-700" : "text-gray-500 hover:bg-gray-100"
+                            }`}
+                            title={showSqlQueries ? "View Results" : "View SQL Query"}
+                          >
+                            <Code className="h-6 w-6" />
+                            <span className="ml-1 text-sm">{showSqlQueries ? "Results" : "SQL"}</span>
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Tab Content with Flip Animation */}
+                      <div className="mt-5 relative">
+                        {activeTab === "results" && response.db_results && (
+                          <>
+                            {/* Results View - shown when SQL is not displayed */}
+                            <div 
+                              className={`transition-all duration-300 ${
+                                showSqlQueries ? 'opacity-0 absolute' : 'opacity-100'
+                              }`}
+                            >
+                              <ResultAccordion 
+                                dbResults={response.db_results} 
+                                onTabChange={handleResultTabChange} 
+                              />
+                            </div>
+                            
+                            {/* SQL Query View - shown when toggled */}
+                            {response.sql_queries && (
+                              <div 
+                                className={`transition-all duration-300 ${
+                                  showSqlQueries ? 'opacity-100' : 'opacity-0 absolute'
+                                }`}
+                              >
+                                <div className="animate-fadeIn bg-gray-50 rounded-xl p-4 border border-gray-200">
+                                  <h3 className="text-lg font-medium text-gray-700 mb-3">
+                                    SQL Query for {activeResultTab.toUpperCase()}
+                                  </h3>
+                                  <SQLAccordion sqlQueries={getActiveDbQueries()} />
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        )}
+                        
+                        {activeTab === "charts" && response.charts && (
+                          <div className="animate-fadeIn">
+                            <ChartAccordion charts={response.charts} />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Error message */}
+                  {response.error && (
+                    <div className="bg-red-50 border border-red-200 text-red-700 px-5 py-4 rounded-xl mt-5 flex items-center text-base">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      <span>{response.error}</span>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="text-gray-500 text-lg">Waiting for response...</div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <div className="flex flex-col gap-4 max-w-5xl mx-auto">
       {/* User Question Block - Right-aligned with blue styling */}
       <div className="flex justify-end">
