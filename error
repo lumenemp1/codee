@@ -1,3 +1,59 @@
+<div className="flex flex-col gap-4 max-w-5xl mx-auto">
+      {/* User Question Block - Right-aligned with blue styling */}
+      <div className="flex justify-end">
+        <div className="bg-blue-600 text-white border border-blue-500 rounded-2xl shadow-sm overflow-hidden max-w-md ml-auto">
+          <div className="p-5 md:p-6">
+            {question?.trim() && (
+                <div className="text-lg font-medium">{question}</div>
+              )}
+            
+            {selectedDBs && selectedDBs.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {selectedDBs.map((db, index) => (
+                  <span key={index} className="text-sm bg-white text-black px-3 py-1 rounded-full">
+                    {db}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # ---------- Fourth Row: All Products Bar Chart ----------
