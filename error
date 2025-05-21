@@ -1,3 +1,191 @@
+import React, { useEffect, useState } from 'react';
+
+const StreamlitEmbedder = ({ analysisType }) => {
+  const [loading, setLoading] = useState(true);
+  
+  // Map analysis types to their respective Streamlit URLs
+  const getStreamlitUrl = () => {
+    // This would be replaced with your actual Streamlit URLs
+    const urlMap = {
+      'trend-analysis': 'http://localhost:8501',
+      'product-bundling': 'http://localhost:8502',
+      'demand-forecasting': 'http://localhost:8503'
+    };
+    
+    return urlMap[analysisType] || 'http://localhost:8501'; // Default to the first URL if not found
+  };
+  
+  useEffect(() => {
+    // Reset loading state when analysis type changes
+    setLoading(true);
+    
+    // Simulate loading time for the iframe
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+    
+    return () => clearTimeout(timer);
+  }, [analysisType]);
+  
+  return (
+    <div className="relative">
+      {/* Loading overlay */}
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75 z-10">
+          <div className="flex flex-col items-center">
+            <div className="flex space-x-2">
+              <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
+              <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+              <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></div>
+            </div>
+            <p className="mt-4 text-gray-600">Loading {analysisType.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')} dashboard...</p>
+          </div>
+        </div>
+      )}
+      
+      {/* Iframe for Streamlit */}
+      <iframe 
+        src={getStreamlitUrl()}
+        title={`${analysisType} Dashboard`}
+        className="w-full min-h-screen rounded-md border-0"
+        onLoad={() => setLoading(false)}
+        style={{ height: 'calc(100vh - 250px)' }}
+      />
+    </div>
+  );
+};
+
+export default StreamlitEmbedder;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import React, { useState, useEffect } from "react";
 
 export default function ResultAccordion({ dbResults, onTabChange }) {
