@@ -1,3 +1,164 @@
+import pandas as pd
+from prophet import Prophet
+from datetime import timedelta
+import plotly.graph_objects as go
+import streamlit as st
+from prophet.plot import plot, plot_components
+from matplotlib import pyplot as plt
+
+file_path = "sorted_file.xlsx"  # Make sure this file is in the same directory
+df = pd.read_excel(file_path)
+
+df.rename(columns={"date": "ds", "total_orders": "y", "product": "product_name"}, inplace=True)
+df["ds"] = pd.to_datetime(df["ds"])
+
+model = Prophet()     # Initialize the model
+model.fit(df)       # Fit the model to the data
+
+future = model.make_future_dataframe(periods=12, freq='M')   # Create a future DataFrame for 12 months
+forecast = model.predict(future)  
+
+plot(model, forecast)               # Plot the forecast
+plot_components(model, forecast)    # Plot the forecast components
+plt.show()
+
+import numpy as np
+from prophet.diagnostics import cross_validation, performance_metrics
+from sklearn.metrics import mean_absolute_error, mean_squared_error
+
+# Perform cross-validation with parameters suitable for 2-year dataset
+# initial: Use 12 months (365 days) for initial training
+# period: Test every 2 months (60 days) 
+# horizon: Forecast 3 months ahead (90 days)
+df_cv = cross_validation(model, initial='365 days', period='60 days', horizon='90 days')
+
+# Calculate performance metrics
+df_metrics = performance_metrics(df_cv)
+
+# Calculate MAE, MSE, and RMSE
+mae = mean_absolute_error(df_cv['y'], df_cv['yhat'])
+mse = mean_squared_error(df_cv['y'], df_cv['yhat'])
+rmse = np.sqrt(mse)
+
+print(f'Mean Absolute Error: {mae:.2f}')
+print(f'Mean Squared Error: {mse:.2f}')
+print(f'Root Mean Squared Error: {rmse:.2f}')
+
+# Display the cross-validation metrics from Prophet
+print("\nProphet Cross-Validation Metrics:")
+print(df_metrics)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 product    MAE   RMSE  MAPE (%)  Accuracy (%)
 0       IP GateWay - RVA Site   1.44   2.19     61.89         38.11
 1            IP GateWay - RVI   0.19   0.37     95.45          4.55
