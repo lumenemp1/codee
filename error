@@ -1,3 +1,216 @@
+product    MAE   RMSE  MAPE (%)  Accuracy (%)
+0       IP GateWay - RVA Site   1.44   2.19     61.89         38.11
+1            IP GateWay - RVI   0.19   0.37     95.45          4.55
+2                      IP VRP  14.75  19.84    118.59        -18.59
+3                       LPort   0.17   0.21    111.68        -11.68
+4                   MSS Cloud   0.27   0.86    100.72         -0.72
+5               Phone Numbers   6.48   7.17    158.33        -58.33
+6                Private Line   4.41   5.82    237.02       -137.02
+7                Internal/IMT   0.58   1.08     67.15         32.85
+8                Pro Services   1.22   2.30     56.47         43.53
+9        Transmission Request   0.47   1.16     98.61          1.39
+10                  TT Bundle   0.14   0.21    113.21        -13.21
+11                      Voice  12.60  17.06    436.41       -336.41
+12              VOIP Services  11.51  20.51     86.72         13.28
+13                 WDM/Lambda   7.60  10.09    260.58       -160.58
+14             Access Circuit  12.36  15.33    162.65        -62.65
+15             Bearer Circuit   0.78   1.08     67.64         32.36
+16  Co-location/Mid-span Meet   2.36   3.20    172.67        -72.67
+17                        CPE  14.59  17.57    146.37        -46.37
+18       Customer Access Port   7.35   9.44    177.07        -77.07
+19                Ethersphere   3.47   4.32    164.58        -64.58
+20                EtherExtend   7.47   9.47    157.38        -57.38
+21         Dedicated Internet  10.32  13.63    271.32       -171.32
+22                 Dark Fiber   2.38   4.72     90.59          9.41
+23                        DSL  13.07  27.46    149.23        -49.23
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import pandas as pd
 from prophet import Prophet
 from datetime import timedelta
