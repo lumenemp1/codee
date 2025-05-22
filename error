@@ -1,3 +1,88 @@
+                                       itemsets  support_count
+1                                         (CPE)        10991.0
+3                             ( Access Circuit)         7548.0
+5                         ( Dedicated Internet)         5482.0
+7                        ( Access Circuit, CPE)         5466.0
+6                                     ( IP VRP)         4277.0
+12                               ( IP VRP, CPE)         3963.0
+4                       ( Customer Access Port)         3766.0
+2                                ( EtherExtend)         3660.0
+0                                      (IP VRP)         3611.0
+9                    ( Dedicated Internet, CPE)         3541.0
+10       ( Dedicated Internet,  Access Circuit)         3329.0
+8      ( Access Circuit,  Customer Access Port)         3121.0
+11  ( Dedicated Internet,  Access Circuit, CPE)         3066.0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import pandas as pd
 from prophet import Prophet
 from datetime import timedelta
