@@ -1,4 +1,117 @@
-                                       itemsets  support_count
+itemsets  support_count
+2                                               (CPE)        10991.0
+5                                   ( Access Circuit)         7548.0
+7                               ( Dedicated Internet)         5482.0
+17                             ( Access Circuit, CPE)         5466.0
+10                                          ( IP VRP)         4277.0
+29                                     ( IP VRP, CPE)         3963.0
+6                             ( Customer Access Port)         3766.0
+4                                      ( EtherExtend)         3660.0
+1                                            (IP VRP)         3611.0
+25                         ( Dedicated Internet, CPE)         3541.0
+26             ( Access Circuit,  Dedicated Internet)         3329.0
+18           ( Customer Access Port,  Access Circuit)         3121.0
+27        ( Access Circuit,  Dedicated Internet, CPE)         3066.0
+14                                ( EtherExtend, CPE)         2315.0
+8                                       (EtherExtend)         2219.0
+11                                            (Voice)         2159.0
+30                         ( IP VRP,  Access Circuit)         2152.0
+31                    ( IP VRP,  Access Circuit, CPE)         2141.0
+15                            ( IP VRP,  EtherExtend)         1923.0
+16                       ( IP VRP,  EtherExtend, CPE)         1912.0
+19                       ( Customer Access Port, CPE)         1806.0
+9                                      ( Ethersphere)         1804.0
+21      ( Customer Access Port,  Access Circuit, CPE)         1772.0
+3                                     (Phone Numbers)         1627.0
+13                          ( Access Circuit, IP VRP)         1592.0
+0                                    (Access Circuit)         1520.0
+28                        (EtherExtend,  Ethersphere)         1464.0
+20                   ( Customer Access Port,  IP VRP)         1444.0
+22              ( Customer Access Port,  IP VRP, CPE)         1437.0
+23  ( IP VRP,  Customer Access Port,  Access Circuit)         1425.0
+24  ( IP VRP,  Customer Access Port,  Access Circu...         1418.0
+12                             (IP VRP,  EtherExtend)         1330.0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+itemsets  support_count
 1                                         (CPE)        10991.0
 3                             ( Access Circuit)         7548.0
 5                         ( Dedicated Internet)         5482.0
