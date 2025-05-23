@@ -1,3 +1,322 @@
+import streamlit as st
+import pandas as pd
+from mlxtend.preprocessing import TransactionEncoder
+from mlxtend.frequent_patterns import fpgrowth, association_rules
+import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+# Load transaction data
+file_path = "orders_details.xlsx"
+df = pd.read_excel(file_path)
+df['Items Bought'] = df['Items Bought'].apply(lambda x: x.split(','))
+
+# Encode transactions
+te = TransactionEncoder()
+te_ary = te.fit(df['Items Bought']).transform(df['Items Bought'])
+df_encoded = pd.DataFrame(te_ary, columns=te.columns_)
+
+# FP-Growth for bundles
+frequent_itemsets = fpgrowth(df_encoded, min_support=0.05, use_colnames=True)
+frequent_itemsets['support_count'] = frequent_itemsets['support'] * len(df)
+frequent_itemsets['length'] = frequent_itemsets['itemsets'].apply(lambda x: len(x))
+bundle_itemsets = frequent_itemsets[frequent_itemsets['length'] >= 2]
+
+# Association rules for recommendations (hardcoded confidence to 0.6)
+rules = association_rules(frequent_itemsets, metric="confidence", min_threshold=0.6)
+rules = rules.sort_values(by='confidence', ascending=False)
+
+# Page config
+st.set_page_config(
+    page_title="Product Bundling & Recommendations", 
+    layout="wide"
+)
+
+# Custom CSS for enhanced styling
+st.markdown("""
+<style>
+    .bundle-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 10px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        transition: transform 0.3s ease;
+    }
+    
+    .bundle-card:hover {
+        transform: scale(1.05);
+    }
+    
+    .stButton > button {
+        width: 100%;
+        border-radius: 10px;
+        border: none;
+        padding: 8px;
+        font-weight: 500;
+        margin: 2px 0;
+    }
+    
+    .stButton > button[disabled] {
+        background-color: #e8f4f8 !important;
+        color: #2c5aa0 !important;
+        border: 1px solid #b8d4ea !important;
+    }
+    
+    .recommendation-section {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 15px 0;
+        border-left: 4px solid #667eea;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# Header
+st.title(" Smart Product Suggestions")
+
+# Main content area with Product Bundles first, then Recommendations
+tab1, tab2 = st.tabs(["📦 Product Bundles", "🎯 Smart Recommendations"])
+
+# Sort bundles by size (largest first)
+bundle_itemsets_sorted = bundle_itemsets.sort_values('length', ascending=False)
+
+with tab1:
+    st.markdown("### 🎁 Popular Product Bundles")
+    
+    # Create a grid layout for bundles with dynamic height
+    cols = st.columns(3)
+    for i, (index, row) in enumerate(bundle_itemsets_sorted.head(12).iterrows()):
+        with cols[i % 3]:
+            items_list = list(row['itemsets'])
+            st.markdown(f"""
+            <div class="bundle-card">
+                <h3> {row['length']}-Item Bundle</h3>
+                <div style="margin: 15px 0; font-size: 1.1em; line-height: 1.4;">
+                    {'<br>'.join([f'• {item}' for item in items_list])}
+                </div>
+                <div style="font-size: 1.3em; font-weight: bold; margin-top: 15px;">
+                    📈 {int(row['support_count'])} orders
+                </div>
+                <div style="font-size: 1.0em; margin-top: 5px;">
+                    ({row['support']:.1%} of all orders)
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+with tab2:
+    st.markdown("### 🔮 Smart Recommendations")
+    st.markdown("*When customers buy certain products together, they often purchase additional items. Here are the patterns we've discovered:*")
+    
+    if len(rules) == 0:
+        st.warning("No recommendation patterns found with 60% confidence threshold.")
+    else:
+        for idx, row in rules.iterrows():
+            antecedents_list = list(row['antecedents'])
+            consequents_list = list(row['consequents'])
+            
+            with st.container():
+                st.markdown(f"""
+                <div class="recommendation-section">
+                    <h4>Recommendation Pattern #{idx + 1}</h4>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                col1, col2 = st.columns([1, 1])
+                
+                with col1:
+                    st.markdown("**If customers buy:**")
+                    for item in antecedents_list:
+                        st.button(f"📦 {item}", key=f"ant_{idx}_{item}", disabled=True)
+                
+                with col2:
+                    st.markdown("**They often also buy:**")
+                    for item in consequents_list:
+                        st.button(f"💡 {item}", key=f"cons_{idx}_{item}", type="primary")
+                
+                # Show confidence percentage
+                st.markdown(f"**Confidence:** {row['confidence']:.0%} of customers who buy the first item(s) also buy the recommended item(s)")
+                
+                st.divider()
+
+# Footer
+st.markdown("---")
+st.markdown("""
+<div style="text-align: center; color: #666; padding: 20px;">
+    <p>🤖 Powered by FP-Growth Algorithm & Association Rules Mining</p>
+    <p>💡 Showing recommendations with 60% confidence or higher</p>
+</div>
+""", unsafe_allow_html=True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 itemsets  support_count
 2                                               (CPE)        10991.0
 5                                   ( Access Circuit)         7548.0
