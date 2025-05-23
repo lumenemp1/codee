@@ -1,3 +1,163 @@
+AI-Driven Product Rationalization & Ordering Platform Consolidation
+
+An AI-powered solution can analyze sales data and product attributes to:​
+Identify similar products for consolidation.​
+Detect low-selling or obsolete products for deprecation.​
+Optimize ordering platform consolidation based on demand and products​
+Introduction of new Product Bundles based on sales data.​
+By rationalizing product portfolios and eliminating redundant platforms, companies can achieve cost savings, improved inventory management, and higher profitability
+
+Problem Statement​
+Multiple Platforms, Redundant Listings: Different regions use various ordering platforms with overlapping or duplicate products.​
+Inconsistent Pricing & Offerings: Products may be priced differently across platforms, affecting profitability.​
+High Inventory Costs Due to Unoptimized Selection: Low-selling products increase storage costs and operational complexity.​
+Lack of Data-Driven Insights for Consolidation: No clear strategy for rationalization or platform optimization
+
+Key benefits:​
+Reduced Inventory & Operational Costs: Eliminates redundant products and storage overhead.​
+Improved Ordering Efficiency: Streamlines platform operations, reducing complexity.​
+Higher Profit Margins: Focus on best-performing products, standardize pricing.​
+Enhanced Customer Experience: Unified, optimized product offerings across platforms.​
+Data-Driven Decision Making: AI-driven insights to make informed decision making on  product bundling and new product focus
+
+Implementation Strategy:​
+Phase 1: Data Collection (Sales history, product attributes, platform details). – In Progress​
+🔹 Phase 2: AI Model Development (Product similarity analysis, clustering, demand forecasting). – In progress​
+🔹 Phase 3: Rationalization Strategy (Product optimization rules, regional adjustments).​
+🔹 Phase 4: Ordering Platform Consolidation (Standardization & transition)​
+
+Expected ROI:​
+Cost Reduction: Eliminating redundant inventory saves operational costs.​
+Sales Growth: Focus on high-demand products maximizes revenue.​
+Efficiency Gains: Streamlined ordering process improves ​
+
+
+
+​​
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import streamlit as st
 import pandas as pd
 from mlxtend.preprocessing import TransactionEncoder
